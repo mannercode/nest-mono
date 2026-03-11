@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Tests",
+            "detail": "npm test",
+            "group": { "kind": "test", "isDefault": true },
+            "type": "shell",
+            "options": { "env": { "TEST_ROOT": "${input:TestRoots}" } },
+            "command": "npm test"
+        },
+        {
+            "label": "Run E2E Tests",
+            "detail": "npm run test:e2e",
+            "type": "shell",
+            "command": "npm run test:e2e"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "TestRoots",
+            "type": "pickString",
+            "options": ["src", "src/apps", "src/libs/common"],
+            "description": "Select the source root."
+        }
+    ]
+}

@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "ESNext",
+        "lib": ["ESNext"],
+        "types": ["node", "jest"],
+
+        "strict": true,
+        "strictPropertyInitialization": false,
+
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+
+        "incremental": true,
+        "sourceMap": true,
+
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+
+        "baseUrl": ".",
+        "outDir": "./_output/build",
+        "paths": {
+            "common": ["src/libs/common/index"],
+            "testlib": ["src/libs/testlib/index"],
+            "shared": ["src/apps/shared/index"],
+            "apps/*": ["src/apps/*"]
+        }
+    },
+    "include": ["src/**/*"]
+}
