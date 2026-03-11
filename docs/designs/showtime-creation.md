@@ -2,7 +2,7 @@
 
 ## 1. 유스케이스 명세서
 
-**목표**: 하나의 영화를 여러 극장에 상영 시간 일괄 등록하기
+**목표**: 하나의 영화를 여러 극장에 상영시간 일괄 등록하기
 
 **액터**: 관리자
 
@@ -14,22 +14,22 @@
 **기본 흐름**:
 
 1. 시스템은 현재 등록된 영화 목록을 제공한다.
-1. 관리자는 상영 시간을 등록할 영화를 선택한다.
+1. 관리자는 상영시간을 등록할 영화를 선택한다.
 1. 시스템은 현재 등록된 극장 목록을 제공한다.
-1. 관리자는 상영 시간을 등록할 극장들을 선택한다.
+1. 관리자는 상영시간을 등록할 극장들을 선택한다.
 1. 관리자는 각 극장에 등록할 상영 시작 시각들과 상영 시간을 입력한다.
 1. 관리자가 등록을 요청한다.
 1. 시스템은 sagaId를 즉시 반환하고, 백그라운드에서 검증 및 생성을 진행한다.
-1. 시스템은 기존 상영 시간과 충돌이 없으면 상영 시간과 티켓을 생성하고 완료 이벤트를 발행한다.
+1. 시스템은 기존 상영시간과 충돌이 없으면 상영시간과 티켓을 생성하고 완료 이벤트를 발행한다.
 
 **대안 흐름**:
 
-- 기존 상영 시간과 충돌이 발생하면, 시스템은 충돌 목록과 함께 실패 이벤트를 발행한다.
+- 기존 상영시간과 충돌이 발생하면, 시스템은 충돌 목록과 함께 실패 이벤트를 발행한다.
 
 **후행 조건**:
 
-- 선택한 극장 각각에 선택한 영화의 상영 시간이 생성된다.
-- 생성된 상영 시간마다 해당 극장의 좌석 배치도(`seatmap`)를 기반으로 티켓이 생성된다.
+- 선택한 극장 각각에 선택한 영화의 상영시간이 생성된다.
+- 생성된 상영시간마다 해당 극장의 좌석 배치도(`seatmap`)를 기반으로 티켓이 생성된다.
 
 ---
 
@@ -37,12 +37,12 @@
 
 ### 2.1. 화면 구성 단계
 
-관리자가 상영 시간 생성 화면을 구성하는 단계이다.
+관리자가 상영시간 생성 화면을 구성하는 단계이다.
 
 ```plantuml
 @startuml
 actor Admin
-Admin -> Frontend: 상영 시간 생성 페이지 방문
+Admin -> Frontend: 상영시간 생성 페이지 방문
     Frontend -> Backend: 영화 목록 요청\nGET /showtime-creation/movies
         Backend -> ShowtimeCreation: searchMoviesPage(pagination)
             ShowtimeCreation -> Movies: searchPage({orderby: releaseDate DESC})
@@ -59,26 +59,26 @@ Admin -> Frontend: 영화 선택
     Frontend <-- Backend: theaters[]
 
 Admin -> Frontend: 극장 선택
-    Frontend -> Backend: 기존 상영 시간 조회\nPOST /showtime-creation/showtimes/search
+    Frontend -> Backend: 기존 상영시간 조회\nPOST /showtime-creation/showtimes/search
         Backend -> ShowtimeCreation: searchShowtimes(theaterIds)
             ShowtimeCreation -> Showtimes: search({theaterIds, endTimeRange: {start: now}})
             ShowtimeCreation <-- Showtimes: ShowtimeDto[]
         Backend <-- ShowtimeCreation: ShowtimeDto[]
     Frontend <-- Backend: showtimes[]
-Admin <-- Frontend: 영화/극장/기존 상영 시간 표시
+Admin <-- Frontend: 영화/극장/기존 상영시간 표시
 @enduml
 ```
 
 ### 2.2. 생성 요청 단계
 
-관리자가 상영 시작 시각들과 상영 시간을 입력하고 등록을 요청하는 단계이다.
+관리자가 상영 시작 시각들과 상영 시간을 입력하고 등록을 요청하는 단계이다. 요청을 받으면 sagaId를 생성하고 Temporal 워크플로우를 시작한 뒤 즉시 응답한다.
 
 ```plantuml
 @startuml
 actor Admin
 
 Admin -> Frontend: 상영 시작 시각, 상영 시간 입력 후 등록 요청
-    Frontend -> Backend: 상영 시간 생성 요청\nPOST /showtime-creation/showtimes
+    Frontend -> Backend: 상영시간 생성 요청\nPOST /showtime-creation/showtimes
     note right
     BulkCreateShowtimesDto {
         movieId: string
@@ -88,11 +88,9 @@ Admin -> Frontend: 상영 시작 시각, 상영 시간 입력 후 등록 요청
     }
     end note
         Backend -> ShowtimeCreation: requestShowtimeCreation(dto)
-            ShowtimeCreation -> Worker: enqueueShowtimeCreationJob(dto)
-                Worker -> Worker: sagaId = newObjectId()
-                Worker -> Events: emitStatusChanged({sagaId, status: Waiting})
-                Worker -> Queue: add('showtime-creation.create', {dto, sagaId})
-            ShowtimeCreation <-- Worker: sagaId
+            ShowtimeCreation -> ShowtimeCreation: sagaId = newObjectId()
+            ShowtimeCreation -> Events: emitStatusChanged({sagaId, status: Waiting})
+            ShowtimeCreation -> Temporal: workflow.start(showtimeCreationWorkflow, {sagaId, dto})
         Backend <-- ShowtimeCreation: RequestShowtimeCreationResponse { sagaId }
     Frontend <-- Backend: { sagaId }
 Admin <-- Frontend: sagaId 수신 (이후 이벤트 대기)
@@ -101,52 +99,58 @@ Admin <-- Frontend: sagaId 수신 (이후 이벤트 대기)
 
 ### 2.3. 백그라운드 처리 단계
 
-BullMQ 워커가 큐에서 작업을 꺼내어 검증과 생성을 수행하는 단계이다.
+Temporal 워크플로우(`showtimeCreationWorkflow`)가 검증과 생성을 수행한다. 각 단계는 Temporal Activity로 실행된다.
 
 ```plantuml
 @startuml
-[o-> Worker: queue에서 {dto, sagaId} 수신
-    Worker -> Events: emitStatusChanged({sagaId, status: Processing})
+box "Temporal Workflow: showtimeCreationWorkflow" #LightBlue
+    [o-> Workflow: {sagaId, dto} 수신
+        Workflow -> Events: [Activity] emitStatusChanged({sagaId, status: Processing})
 
-    Worker -> Validator: validate(dto)
-        Validator -> Movies: allExist([movieId])
-        Validator <-- Movies: boolean
-        Validator -> Theaters: allExist(theaterIds)
-        Validator <-- Theaters: boolean
-        Validator -> Validator: generateTimeslotMapByTheater(dto)
-            note right
-            극장별로 기존 상영 시간을 조회하여
-            timeslot(10분 단위) → ShowtimeDto Map 생성
-            end note
-        Validator -> Validator: findConflictingShowtimes(dto)
-    Worker <-- Validator: { conflictingShowtimes, isValid }
+        Workflow -> Validator: [Activity] validateShowtimes(dto)
+            Validator -> Movies: allExist([movieId])
+            Validator <-- Movies: boolean
+            Validator -> Theaters: allExist(theaterIds)
+            Validator <-- Theaters: boolean
+            Validator -> Validator: generateTimeslotMapByTheater(dto)
+                note right
+                극장별로 기존 상영시간을 조회하여
+                timeslot(10분 단위) → ShowtimeDto Map 생성
+                end note
+            Validator -> Validator: findConflictingShowtimes(dto)
+        Workflow <-- Validator: { conflictingShowtimes, isValid }
 
-alt isValid = true
-    Worker -> Creator: create(dto, sagaId)
-        Creator -> Showtimes: createMany(showtimeDtos)
-        Creator -> Showtimes: search({sagaIds: [sagaId]})
-        Creator <-- Showtimes: ShowtimeDto[]
-        loop showtime in showtimes
-            Creator -> Theaters: getMany([theaterId])
-            Creator <-- Theaters: TheaterDto
-            Creator -> Tickets: createMany(ticketDtos based on seatmap)
-            Creator <-- Tickets: { count }
-        end
-    Worker <-- Creator: { createdShowtimeCount, createdTicketCount }
-    Worker -> Events: emitStatusChanged({sagaId, status: Succeeded, createdShowtimeCount, createdTicketCount})
-else isValid = false
-    Worker -> Events: emitStatusChanged({sagaId, status: Failed, conflictingShowtimes})
-end
+    alt isValid = true
+        Workflow -> Creator: [Activity] createShowtimes(dto, sagaId)
+            Creator -> Showtimes: createMany(showtimeDtos)
+            Creator -> Showtimes: search({sagaIds: [sagaId]})
+            Creator <-- Showtimes: ShowtimeDto[]
+            loop showtime in showtimes
+                Creator -> Theaters: getMany([theaterId])
+                Creator <-- Theaters: TheaterDto
+                Creator -> Tickets: createMany(ticketDtos based on seatmap)
+                Creator <-- Tickets: { count }
+            end
+        Workflow <-- Creator: { createdShowtimeCount, createdTicketCount }
+        Workflow -> Events: [Activity] emitStatusChanged({sagaId, status: Succeeded, createdShowtimeCount, createdTicketCount})
+    else isValid = false
+        Workflow -> Events: [Activity] emitStatusChanged({sagaId, status: Failed, conflictingShowtimes})
+    end
+
+    group Exception Handling [Activity 실행 중 예외 발생 시]
+        Workflow -> Events: emitStatusChanged({sagaId, status: Error, error})
+    end
+end box
 @enduml
 ```
 
 ---
 
-## 3. 상영 시간 충돌 검증 알고리즘
+## 3. 상영시간 충돌 검증 알고리즘
 
 ### 원리
 
-기존 상영 시간을 **10분 단위 timeslot**으로 펼쳐 `Map<timeslot, ShowtimeDto>`를 구성한다. 신규 상영 시간의 구간(`startTime` ~ `startTime + durationInMinutes`)을 같은 단위로 순회하여 Map에 존재하면 충돌로 판정한다.
+기존 상영시간을 **10분 단위 timeslot**으로 펼쳐 `Map<timeslot, ShowtimeDto>`를 구성한다. 신규 상영시간의 구간(`startTime` ~ `startTime + durationInMinutes`)을 같은 단위로 순회하여 Map에 존재하면 충돌로 판정한다.
 
 ### 타임슬롯 단위
 
@@ -182,8 +186,8 @@ for each theaterId:
 ### 시간 복잡도
 
 ```
-M = 신규 상영 시간 수 (theaterIds × startTimes)
-N = 기존 상영 시간 수 (극장당)
+M = 신규 상영시간 수 (theaterIds × startTimes)
+N = 기존 상영시간 수 (극장당)
 ```
 
 timeslot Map을 선(先)구성하면 충돌 탐색이 O(1) 조회가 되어 전체 복잡도는 **O(M + N)**이 된다.

@@ -9,7 +9,7 @@
 **선행 조건**:
 
 - 고객은 시스템에 로그인되어 있어야 한다.
-- 구매할 영화의 상영 시간과 좌석이 사용 가능해야 한다.
+- 구매할 영화의 상영시간과 좌석이 사용 가능해야 한다.
 
 **기본 흐름**:
 
@@ -19,8 +19,8 @@
 1. 고객은 극장을 선택한다.
 1. 시스템은 선택한 극장의 상영일 목록을 제공한다.
 1. 고객은 원하는 상영일을 선택한다.
-1. 시스템은 해당 상영일의 상영 시간 목록과 잔여 좌석 수를 제공한다.
-1. 고객은 원하는 상영 시간을 선택한다.
+1. 시스템은 해당 상영일의 상영시간 목록과 잔여 좌석 수를 제공한다.
+1. 고객은 원하는 상영시간을 선택한다.
 1. 시스템은 선택 가능한 좌석 목록을 제공한다.
 1. 고객은 하나 이상의 좌석을 선택한다. 선택한 좌석은 10분간 선점된다.
 1. 고객은 결제 정보를 입력하고 구매를 확정한다.
@@ -49,7 +49,7 @@
 actor Customer
 
 Customer -> Frontend: 영화 예매 시스템 접속
-    Frontend -> Backend: 추천 영화 목록 요청\nGET /recommendation/movies
+    Frontend -> Backend: 추천 영화 목록 요청\nGET /movies/recommended
         Backend -> Recommendation: searchRecommendedMovies(customerId?)
             Recommendation -> Showtimes: searchMovieIds({startTimeRange: {start: now + 30m}})
             Recommendation <-- Showtimes: movieIds[]
@@ -72,7 +72,7 @@ Customer <-- Frontend: 추천 영화 목록 제공
 @enduml
 ```
 
-### 2.2. 극장 / 날짜 / 상영 시간 선택
+### 2.2. 극장 / 날짜 / 상영시간 선택
 
 ```plantuml
 @startuml
@@ -100,7 +100,7 @@ Customer -> Frontend: 극장 선택
 Customer <-- Frontend: 상영일 목록 제공
 
 Customer -> Frontend: 상영일 선택
-    Frontend -> Backend: 상영 시간 목록 요청\nGET /booking/movies/{movieId}/theaters/{theaterId}/showdates/{showdate}/showtimes
+    Frontend -> Backend: 상영시간 목록 요청\nGET /booking/movies/{movieId}/theaters/{theaterId}/showdates/{showdate}/showtimes
         Backend -> Booking: searchShowtimes({movieId, theaterId, showdate})
             Booking -> Showtimes: search({movieIds, theaterIds, startTimeRange: [하루 범위]})
             Booking <-- Showtimes: ShowtimeDto[]
@@ -117,7 +117,7 @@ Customer -> Frontend: 상영일 선택
             Booking -> Booking: generateShowtimesForBooking(showtimes, ticketSales)
         Backend <-- Booking: ShowtimeWithSalesDto[]
     Frontend <-- Backend: showtimesWithSales[]
-Customer <-- Frontend: 상영 시간 + 잔여 좌석 수 제공
+Customer <-- Frontend: 상영시간 + 잔여 좌석 수 제공
 @enduml
 ```
 
@@ -127,7 +127,7 @@ Customer <-- Frontend: 상영 시간 + 잔여 좌석 수 제공
 @startuml
 actor Customer
 
-Customer -> Frontend: 상영 시간 선택
+Customer -> Frontend: 상영시간 선택
     Frontend -> Backend: 티켓 목록 요청\nGET /booking/showtimes/{showtimeId}/tickets
         Backend -> Booking: getTickets(showtimeId)
             Booking -> Showtimes: allExist([showtimeId])
@@ -162,6 +162,8 @@ Customer <-- Frontend: 좌석 선점 완료 안내
 
 ### 2.4. 결제 및 구매 완료
 
+Temporal 워크플로우(`purchaseWorkflow`)가 구매 흐름 전체를 오케스트레이션한다. 각 단계는 Temporal Activity로 실행되며, 실패 시 보상 스택을 역순으로 실행한다.
+
 ```plantuml
 @startuml
 actor Customer
@@ -173,43 +175,49 @@ Customer -> Frontend: 결제 정보 입력 및 구매 확정
         customerId: string
         totalPrice: number
         purchaseItems: [
-            { type: 'Tickets', itemId: ticketId }
+            { type: 'tickets', itemId: ticketId }
         ]
     }
     end note
         Backend -> Purchase: processPurchase(dto)
+            Purchase -> Temporal: workflow.start(purchaseWorkflow, dto)
 
-            Purchase -> TicketPurchase: validatePurchase(dto)
-            activate TicketPurchase
-                TicketPurchase -> Tickets: getMany(ticketIds)
-                TicketPurchase <-- Tickets: TicketDto[]
-                TicketPurchase -> Showtimes: getMany(showtimeIds)
-                TicketPurchase <-- Showtimes: ShowtimeDto[]
-                TicketPurchase -> TicketPurchase: validateTicketCount(ticketItems)
-                note right: 최대 10장
-                TicketPurchase -> TicketPurchase: validatePurchaseTime(showtimes)
-                note right: 상영 시작 30분 전까지
-                TicketPurchase -> TicketHolding: searchHeldTicketIds(showtimeId, customerId)
-                TicketPurchase <-- TicketHolding: heldTicketIds[]
-                TicketPurchase -> TicketPurchase: 모든 티켓이 선점 상태인지 확인
-            Purchase <-- TicketPurchase: void (검증 완료)
-            deactivate TicketPurchase
+            box "Temporal Workflow: purchaseWorkflow" #LightBlue
+                Temporal -> TicketPurchase: [Activity] validatePurchase(dto)
+                activate TicketPurchase
+                    TicketPurchase -> Tickets: getMany(ticketIds)
+                    TicketPurchase <-- Tickets: TicketDto[]
+                    TicketPurchase -> Showtimes: getMany(showtimeIds)
+                    TicketPurchase <-- Showtimes: ShowtimeDto[]
+                    TicketPurchase -> TicketPurchase: validateTicketCount(ticketItems)
+                    note right: 최대 10장
+                    TicketPurchase -> TicketPurchase: validatePurchaseTime(showtimes)
+                    note right: 상영 시작 30분 전까지
+                    TicketPurchase -> TicketHolding: searchHeldTicketIds(showtimeId, customerId)
+                    TicketPurchase <-- TicketHolding: heldTicketIds[]
+                    TicketPurchase -> TicketPurchase: 모든 티켓이 선점 상태인지 확인
+                Temporal <-- TicketPurchase: void (검증 완료)
+                deactivate TicketPurchase
 
-            Purchase -> Payments: create({amount: totalPrice, customerId})
-            Purchase <-- Payments: PaymentDto
+                Temporal -> Payments: [Activity] createPayment(totalPrice, customerId)
+                Temporal <-- Payments: PaymentDto
+                note right: 보상 스택에 cancelPayment 등록
 
-            Purchase -> PurchaseRecords: create({...dto, paymentId})
-            Purchase <-- PurchaseRecords: PurchaseRecordDto
+                Temporal -> PurchaseRecords: [Activity] createPurchaseRecord({...dto, paymentId})
+                Temporal <-- PurchaseRecords: PurchaseRecordDto
+                note right: 보상 스택에 deletePurchaseRecord 등록
 
-            Purchase -> TicketPurchase: completePurchase(dto)
-            activate TicketPurchase
-                TicketPurchase -> Tickets: updateStatusMany(ticketIds, 'Sold')
-                TicketPurchase <-- Tickets: TicketDto[]
-                TicketPurchase -> Events: emitTicketPurchased(customerId, ticketIds)
-                note left: WatchRecords가 이 이벤트를 구독한다
-            Purchase <-- TicketPurchase: void
-            deactivate TicketPurchase
+                Temporal -> TicketPurchase: [Activity] completePurchase(dto)
+                activate TicketPurchase
+                    TicketPurchase -> Tickets: updateStatusMany(ticketIds, TicketStatus.Sold)
+                    TicketPurchase <-- Tickets: TicketDto[]
+                    TicketPurchase -> Events: emitTicketPurchased(customerId, ticketIds)
+                    note left: WatchRecords가 이 이벤트를 구독한다
+                Temporal <-- TicketPurchase: void
+                deactivate TicketPurchase
+            end box
 
+            Purchase <-- Temporal: PurchaseRecordDto
         Backend <-- Purchase: PurchaseRecordDto
     Frontend <-- Backend: 구매 완료 정보
 Customer <-- Frontend: 구매 완료 안내
@@ -218,20 +226,26 @@ Customer <-- Frontend: 구매 완료 안내
 
 ---
 
-## 3. 롤백 처리
+## 3. 롤백 처리 (Temporal 보상 스택)
 
-`completePurchase` 중 예외 발생 시 `rollbackPurchase`를 호출한다.
+워크플로우 실행 중 예외가 발생하면 보상 스택을 역순으로 실행한다.
 
 ```plantuml
 @startuml
-Purchase -> TicketPurchase: completePurchase(dto)
-Purchase <-- TicketPurchase: error 발생
-Purchase -> TicketPurchase: rollbackPurchase(dto)
-    TicketPurchase -> Tickets: updateStatusMany(ticketIds, 'Available')
+[o-> Workflow: 예외 발생
+
+Workflow -> Workflow: 보상 스택 역순 실행
+    Workflow -> PurchaseRecords: [Compensation] deletePurchaseRecord(id)
+    Workflow <-- PurchaseRecords: void
+    Workflow -> Payments: [Compensation] cancelPayment(paymentId)
+    Workflow <-- Payments: void
+
+Workflow -> TicketPurchase: [Compensation] rollbackPurchase(dto)
+    TicketPurchase -> Tickets: updateStatusMany(ticketIds, TicketStatus.Available)
     TicketPurchase -> Events: emitTicketPurchaseCanceled(customerId, ticketIds)
-Purchase <-- TicketPurchase: void
-Purchase -> Purchase: throw error
+Workflow <-- TicketPurchase: void
+Workflow -> Workflow: throw error
 @enduml
 ```
 
-> 결제(`Payments.create`)는 롤백하지 않는다. 결제 취소는 별도 프로세스에서 처리한다.
+> 보상 스택은 성공한 Activity만 역순으로 취소한다. 예를 들어 `createPayment`까지만 성공했다면 `cancelPayment`만 실행되고 `deletePurchaseRecord`는 실행되지 않는다.
