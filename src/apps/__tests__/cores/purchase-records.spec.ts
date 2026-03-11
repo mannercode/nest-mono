@@ -20,7 +20,7 @@ describe('PurchaseRecordsService', () => {
         // 생성된 구매 기록을 반환한다
         it('returns the created purchase record', async () => {
             const createDto = buildCreatePurchaseRecordDto()
-            const purchaseRecord = await fix.purchaseRecordsClient.create(createDto)
+            const purchaseRecord = await fix.purchaseRecordsService.create(createDto)
 
             expect(purchaseRecord).toEqual({
                 createdAt: expect.any(Date),

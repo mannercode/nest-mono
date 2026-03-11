@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common'
-import { ClientProxyService } from 'common'
-import { InjectClientProxy } from 'common'
-import { Events } from 'shared'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import type { ShowtimeCreationEvent } from './services/types'
 
 @Injectable()
 export class ShowtimeCreationEvents {
-    constructor(@InjectClientProxy() private readonly proxy: ClientProxyService) {}
+    constructor(private readonly eventEmitter: EventEmitter2) {}
 
     emitStatusChanged(payload: ShowtimeCreationEvent) {
-        return this.proxy.emit(Events.ShowtimeCreation.statusChanged, payload)
+        this.eventEmitter.emit('showtime-creation.statusChanged', payload)
     }
 }

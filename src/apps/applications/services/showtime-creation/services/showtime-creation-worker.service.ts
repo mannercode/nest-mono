@@ -1,7 +1,7 @@
 import { InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq'
 import { OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { Injectable } from '@nestjs/common'
-import { ShowtimesClient, TicketsClient } from 'apps/cores'
+import { ShowtimesService, TicketsService } from 'apps/cores'
 import { Job, Queue } from 'bullmq'
 import { Json, newObjectIdString } from 'common'
 import { get } from 'lodash'
@@ -22,8 +22,8 @@ export class ShowtimeCreationWorkerService
         private readonly validatorService: ShowtimeBulkValidatorService,
         private readonly creatorService: ShowtimeBulkCreatorService,
         private readonly events: ShowtimeCreationEvents,
-        private readonly showtimesClient: ShowtimesClient,
-        private readonly ticketsClient: TicketsClient,
+        private readonly showtimesService: ShowtimesService,
+        private readonly ticketsService: TicketsService,
         @InjectQueue('showtime-creation') private readonly queue: Queue
     ) {
         super()
@@ -34,7 +34,7 @@ export class ShowtimeCreationWorkerService
 
         const jobData = { createDto, sagaId } as ShowtimeCreationJobData
 
-        await this.events.emitStatusChanged({ sagaId, status: ShowtimeCreationStatus.Waiting })
+        this.events.emitStatusChanged({ sagaId, status: ShowtimeCreationStatus.Waiting })
 
         await this.queue.add('showtime-creation.create', jobData)
 
@@ -72,7 +72,7 @@ export class ShowtimeCreationWorkerService
                 await this.compensate(job.data.sagaId)
             } catch {}
 
-            await this.events.emitStatusChanged({
+            this.events.emitStatusChanged({
                 message,
                 sagaId: job.data.sagaId,
                 status: ShowtimeCreationStatus.Error
@@ -82,26 +82,26 @@ export class ShowtimeCreationWorkerService
 
     private async compensate(sagaId: string) {
         await Promise.allSettled([
-            this.ticketsClient.deleteBySagaIds([sagaId]),
-            this.showtimesClient.deleteBySagaIds([sagaId])
+            this.ticketsService.deleteBySagaIds([sagaId]),
+            this.showtimesService.deleteBySagaIds([sagaId])
         ])
     }
 
     private async processJobData({ createDto, sagaId }: ShowtimeCreationJobData) {
-        await this.events.emitStatusChanged({ sagaId, status: ShowtimeCreationStatus.Processing })
+        this.events.emitStatusChanged({ sagaId, status: ShowtimeCreationStatus.Processing })
 
         const { conflictingShowtimes, isValid } = await this.validatorService.validate(createDto)
 
         if (isValid) {
             const creationResult = await this.creatorService.create(createDto, sagaId)
 
-            await this.events.emitStatusChanged({
+            this.events.emitStatusChanged({
                 sagaId,
                 status: ShowtimeCreationStatus.Succeeded,
                 ...creationResult
             })
         } else {
-            await this.events.emitStatusChanged({
+            this.events.emitStatusChanged({
                 conflictingShowtimes,
                 sagaId,
                 status: ShowtimeCreationStatus.Failed

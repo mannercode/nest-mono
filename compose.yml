@@ -13,36 +13,15 @@ x-app-base: &app-base
         }
 
 services:
-    gateway:
+    app:
         <<: *app-base
-        build: { context: ., args: { TARGET_APP: gateway } }
-        image: gateway
-        container_name: gateway
+        build: { context: . }
+        image: nest-mono
+        container_name: app
         ports: ['${HTTP_PORT}:${HTTP_PORT}']
-
-    applications:
-        <<: *app-base
-        build: { context: ., args: { TARGET_APP: applications } }
-        image: applications
-        container_name: applications
-
-    cores:
-        <<: *app-base
-        build: { context: ., args: { TARGET_APP: cores } }
-        image: cores
-        container_name: cores
-
-    infrastructures:
-        <<: *app-base
-        build: { context: ., args: { TARGET_APP: infrastructures } }
-        image: infrastructures
-        container_name: infrastructures
 
     apps-setup:
         image: docker:cli
         container_name: apps-setup
         depends_on:
-            gateway: { condition: service_healthy }
-            applications: { condition: service_healthy }
-            cores: { condition: service_healthy }
-            infrastructures: { condition: service_healthy }
+            app: { condition: service_healthy }

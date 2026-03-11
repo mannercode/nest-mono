@@ -1,32 +1,27 @@
 import { MessageEvent, OnModuleDestroy } from '@nestjs/common'
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Sse } from '@nestjs/common'
-import { EventPattern } from '@nestjs/microservices'
+import { OnEvent } from '@nestjs/event-emitter'
 import {
     BulkCreateShowtimesDto,
-    ShowtimeCreationClient,
+    ShowtimeCreationService,
     ShowtimeCreationEvent
 } from 'apps/applications'
 import { PaginationDto } from 'common'
 import { Observable } from 'rxjs'
 import { Subject } from 'rxjs'
-import { Events } from 'shared'
 
 @Controller('showtime-creation')
 export class ShowtimeCreationHttpController implements OnModuleDestroy {
     private eventStream = new Subject<MessageEvent>()
 
-    constructor(private readonly showtimeCreationClient: ShowtimeCreationClient) {}
+    constructor(private readonly showtimeCreationService: ShowtimeCreationService) {}
 
     @Sse('event-stream')
     getEventStream(): Observable<MessageEvent> {
         return this.eventStream.asObservable()
     }
 
-    @EventPattern(Events.ShowtimeCreation.statusChanged, {
-        // It broadcasts events to all instances.
-        // 모든 인스턴스에 이벤트를 브로드캐스팅한다.
-        queue: false
-    })
+    @OnEvent('showtime-creation.statusChanged')
     handleEvent(data: ShowtimeCreationEvent) {
         this.eventStream.next({ data })
     }
@@ -38,22 +33,22 @@ export class ShowtimeCreationHttpController implements OnModuleDestroy {
     @HttpCode(HttpStatus.ACCEPTED)
     @Post('showtimes')
     async requestShowtimeCreation(@Body() createDto: BulkCreateShowtimesDto) {
-        return this.showtimeCreationClient.requestShowtimeCreation(createDto)
+        return this.showtimeCreationService.requestShowtimeCreation(createDto)
     }
 
     @Get('movies')
     async searchMoviesPage(@Query() searchDto: PaginationDto) {
-        return this.showtimeCreationClient.searchMoviesPage(searchDto)
+        return this.showtimeCreationService.searchMoviesPage(searchDto)
     }
 
     @HttpCode(HttpStatus.OK)
     @Post('showtimes/search')
     async searchShowtimesByTheaterIds(@Body('theaterIds') theaterIds: string[]) {
-        return this.showtimeCreationClient.searchShowtimes(theaterIds)
+        return this.showtimeCreationService.searchShowtimes(theaterIds)
     }
 
     @Get('theaters')
     async searchTheatersPage(@Query() searchDto: PaginationDto) {
-        return this.showtimeCreationClient.searchTheatersPage(searchDto)
+        return this.showtimeCreationService.searchTheatersPage(searchDto)
     }
 }

@@ -58,13 +58,13 @@ describe('MoviesPublish', () => {
                         .post(`/movies/${movie.id}/publish`)
                         .ok()
 
-                    const moviePage = await fix.moviesClient.searchPage({ title: `MovieTitle` })
+                    const moviePage = await fix.moviesService.searchPage({ title: `MovieTitle` })
                     expect(moviePage.items[0]).toEqual(publishedMovie)
                 })
 
                 // 공개 전에는 검색되지 않는다
                 it('does not find the movie before publishing', async () => {
-                    const moviePage = await fix.moviesClient.searchPage({ title: `MovieTitle` })
+                    const moviePage = await fix.moviesService.searchPage({ title: `MovieTitle` })
                     expect(moviePage.items).toHaveLength(0)
                 })
             })

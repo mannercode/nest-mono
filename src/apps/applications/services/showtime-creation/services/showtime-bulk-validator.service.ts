@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { MoviesClient, ShowtimeDto, ShowtimesClient, TheatersClient } from 'apps/cores'
+import { MoviesService, ShowtimeDto, ShowtimesService, TheatersService } from 'apps/cores'
 import { DateTimeRange, DateUtil, Require, Time } from 'common'
 import { Rules } from 'shared'
 import { BulkCreateShowtimesDto } from '../dtos'
@@ -25,9 +25,9 @@ const iterateTimeslots = (
 @Injectable()
 export class ShowtimeBulkValidatorService {
     constructor(
-        private readonly theatersClient: TheatersClient,
-        private readonly moviesClient: MoviesClient,
-        private readonly showtimesClient: ShowtimesClient
+        private readonly theatersService: TheatersService,
+        private readonly moviesService: MoviesService,
+        private readonly showtimesService: ShowtimesService
     ) {}
 
     async validate(createDto: BulkCreateShowtimesDto) {
@@ -80,7 +80,7 @@ export class ShowtimeBulkValidatorService {
         const timeslotsByTheater = new Map<string, TimeslotMap>()
 
         for (const theaterId of theaterIds) {
-            const fetchedShowtimes = await this.showtimesClient.search({
+            const fetchedShowtimes = await this.showtimesService.search({
                 startTimeRange: { end: endDate, start: startDate },
                 theaterIds: [theaterId]
             })
@@ -102,7 +102,7 @@ export class ShowtimeBulkValidatorService {
     }
 
     private async verifyMovieExists(movieId: string) {
-        const movieExists = await this.moviesClient.allExist([movieId])
+        const movieExists = await this.moviesService.allExist([movieId])
 
         if (!movieExists) {
             throw new NotFoundException(ShowtimeCreationErrors.MovieNotFound(movieId))
@@ -110,7 +110,7 @@ export class ShowtimeBulkValidatorService {
     }
 
     private async verifyTheatersExist(theaterIds: string[]) {
-        const theatersExist = await this.theatersClient.allExist(theaterIds)
+        const theatersExist = await this.theatersService.allExist(theaterIds)
 
         if (!theatersExist) {
             throw new NotFoundException(ShowtimeCreationErrors.TheatersNotFound(theaterIds))

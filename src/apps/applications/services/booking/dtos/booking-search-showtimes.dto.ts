@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer'
 import { IsDate, IsNotEmpty, IsString } from 'class-validator'
 
 export class BookingSearchShowtimesDto {
@@ -7,7 +6,6 @@ export class BookingSearchShowtimesDto {
     movieId: string
 
     @IsDate()
-    @Type(() => Date)
     showdate: Date
 
     @IsNotEmpty()

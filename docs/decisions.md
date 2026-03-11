@@ -6,7 +6,7 @@
 
 ## 1. 메시지 브로커: NATS 선택
 
-> 마이크로서비스 구조인 [nest-msa](https://github.com/mannercode/nest-msa) 프로젝트에 해당하는 결정입니다.
+> 마이크로서비스 구조인 [nest-msa](https://github.com/mannercode/nest-msa) 프로젝트에 해당하는 결정입니다. 현재 모놀리식 구조에서는 NATS를 사용하지 않습니다.
 
 ### 결정
 
@@ -37,6 +37,8 @@ NestJS가 지원하는 메시지 브로커 여러 종류를 검토한 결과, NA
 ---
 
 ## 2. 워크플로우 오케스트레이션: Temporal 선택
+
+> 마이크로서비스 구조인 [nest-msa](https://github.com/mannercode/nest-msa) 프로젝트에 해당하는 결정입니다. 현재 모놀리식 구조에서는 BullMQ를 사용합니다.
 
 ### 결정
 

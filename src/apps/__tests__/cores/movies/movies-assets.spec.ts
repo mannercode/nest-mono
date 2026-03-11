@@ -114,7 +114,7 @@ describe('MoviesAssets', () => {
 
                 // 에셋 URL을 무효화한다
                 it('invalidates asset URL', async () => {
-                    const [asset] = await fix.assetsClient.getMany([assetId])
+                    const [asset] = await fix.assetsService.getMany([assetId])
                     Require.defined(asset.download)
 
                     await fix.httpClient.delete(`/movies/${movie.id}/assets/${assetId}`).noContent()

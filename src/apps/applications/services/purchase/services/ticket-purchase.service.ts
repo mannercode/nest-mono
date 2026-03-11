@@ -2,9 +2,9 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import {
     PurchaseItemDto,
     ShowtimeDto,
-    ShowtimesClient,
-    TicketHoldingClient,
-    TicketsClient
+    ShowtimesService,
+    TicketHoldingService,
+    TicketsService
 } from 'apps/cores'
 import { PurchaseItemType, TicketStatus } from 'apps/cores'
 import { DateUtil } from 'common'
@@ -17,9 +17,9 @@ import { PurchaseEvents } from '../purchase.events'
 @Injectable()
 export class TicketPurchaseService {
     constructor(
-        private readonly ticketsClient: TicketsClient,
-        private readonly showtimesClient: ShowtimesClient,
-        private readonly ticketHoldingClient: TicketHoldingClient,
+        private readonly ticketsService: TicketsService,
+        private readonly showtimesService: ShowtimesService,
+        private readonly ticketHoldingService: TicketHoldingService,
         private readonly events: PurchaseEvents
     ) {}
 
@@ -29,9 +29,9 @@ export class TicketPurchaseService {
         )
         const ticketIds = ticketItems.map((item) => item.itemId)
 
-        await this.ticketsClient.updateStatusMany(ticketIds, TicketStatus.Sold)
+        await this.ticketsService.updateStatusMany(ticketIds, TicketStatus.Sold)
 
-        await this.events.emitTicketPurchased(createDto.customerId, ticketIds)
+        this.events.emitTicketPurchased(createDto.customerId, ticketIds)
     }
 
     async rollbackPurchase(createDto: CreatePurchaseDto): Promise<void> {
@@ -40,9 +40,9 @@ export class TicketPurchaseService {
         )
         const ticketIds = ticketItems.map((item) => item.itemId)
 
-        await this.ticketsClient.updateStatusMany(ticketIds, TicketStatus.Available)
+        await this.ticketsService.updateStatusMany(ticketIds, TicketStatus.Available)
 
-        await this.events.emitTicketPurchaseCanceled(createDto.customerId, ticketIds)
+        this.events.emitTicketPurchaseCanceled(createDto.customerId, ticketIds)
     }
 
     async validatePurchase(createDto: CreatePurchaseDto): Promise<void> {
@@ -58,10 +58,10 @@ export class TicketPurchaseService {
 
     private async getShowtimes(ticketItems: PurchaseItemDto[]) {
         const ticketIds = ticketItems.map((item) => item.itemId)
-        const tickets = await this.ticketsClient.getMany(ticketIds)
+        const tickets = await this.ticketsService.getMany(ticketIds)
         const showtimeIds = tickets.map((ticket) => ticket.showtimeId)
         const uniqueShowtimeIds = uniq(showtimeIds)
-        const showtimes = await this.showtimesClient.getMany(uniqueShowtimeIds)
+        const showtimes = await this.showtimesService.getMany(uniqueShowtimeIds)
 
         return showtimes
     }
@@ -74,7 +74,7 @@ export class TicketPurchaseService {
         const heldTicketIds: string[] = []
 
         for (const showtime of showtimes) {
-            const ticketIds = await this.ticketHoldingClient.searchHeldTicketIds(
+            const ticketIds = await this.ticketHoldingService.searchHeldTicketIds(
                 showtime.id,
                 customerId
             )

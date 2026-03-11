@@ -13,38 +13,38 @@ import {
 import {
     CreateTheaterDto,
     SearchTheatersPageDto,
-    TheatersClient,
+    TheatersService,
     UpdateTheaterDto
 } from 'apps/cores'
 
 @Controller('theaters')
 export class TheatersHttpController {
-    constructor(private readonly theatersClient: TheatersClient) {}
+    constructor(private readonly theatersService: TheatersService) {}
 
     @Post()
     async create(@Body() createDto: CreateTheaterDto) {
-        return this.theatersClient.create(createDto)
+        return this.theatersService.create(createDto)
     }
 
     @Delete(':theaterId')
     @HttpCode(HttpStatus.NO_CONTENT)
     async delete(@Param('theaterId') theaterId: string) {
-        await this.theatersClient.deleteMany([theaterId])
+        await this.theatersService.deleteMany([theaterId])
     }
 
     @Get(':theaterId')
     async get(@Param('theaterId') theaterId: string) {
-        const [theater] = await this.theatersClient.getMany([theaterId])
+        const [theater] = await this.theatersService.getMany([theaterId])
         return theater
     }
 
     @Get()
     async searchPage(@Query() searchDto: SearchTheatersPageDto) {
-        return this.theatersClient.searchPage(searchDto)
+        return this.theatersService.searchPage(searchDto)
     }
 
     @Patch(':theaterId')
     async update(@Param('theaterId') theaterId: string, @Body() updateDto: UpdateTheaterDto) {
-        return this.theatersClient.update(theaterId, updateDto)
+        return this.theatersService.update(theaterId, updateDto)
     }
 }

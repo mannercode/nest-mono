@@ -30,13 +30,6 @@ export class AppConfigService extends BaseConfigService {
         MONGO_PORT3: Joi.number().required(),
         MONGO_REPLICA_SET: Joi.string().required(),
         MONGO_USERNAME: Joi.string().required(),
-        NATS_HOST1: Joi.string().required(),
-        NATS_HOST2: Joi.string().required(),
-        NATS_HOST3: Joi.string().required(),
-        NATS_PORT1: Joi.number().required(),
-        NATS_PORT2: Joi.number().required(),
-        NATS_PORT3: Joi.number().required(),
-
         NODE_ENV: Joi.string().valid('development', 'production', 'test').required(),
         REDIS_HOST1: Joi.string().required(),
         REDIS_HOST2: Joi.string().required(),
@@ -97,16 +90,6 @@ export class AppConfigService extends BaseConfigService {
             replicaSet: this.getString('MONGO_REPLICA_SET'),
             user: this.getString('MONGO_USERNAME')
         }
-    }
-
-    get nats() {
-        const servers = [
-            `nats://${this.getString('NATS_HOST1')}:${this.getNumber('NATS_PORT1')}`,
-            `nats://${this.getString('NATS_HOST2')}:${this.getNumber('NATS_PORT2')}`,
-            `nats://${this.getString('NATS_HOST3')}:${this.getNumber('NATS_PORT3')}`
-        ]
-
-        return { servers }
     }
 
     get redis() {

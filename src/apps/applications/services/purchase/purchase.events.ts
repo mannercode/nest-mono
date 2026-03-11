@@ -1,17 +1,15 @@
 import { Injectable } from '@nestjs/common'
-import { ClientProxyService } from 'common'
-import { InjectClientProxy } from 'common'
-import { Events } from 'shared'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
 export class PurchaseEvents {
-    constructor(@InjectClientProxy() private readonly proxy: ClientProxyService) {}
+    constructor(private readonly eventEmitter: EventEmitter2) {}
 
     emitTicketPurchaseCanceled(customerId: string, ticketIds: string[]) {
-        return this.proxy.emit(Events.Purchase.ticketPurchaseCanceled, { customerId, ticketIds })
+        this.eventEmitter.emit('purchase.ticketPurchaseCanceled', { customerId, ticketIds })
     }
 
     emitTicketPurchased(customerId: string, ticketIds: string[]) {
-        return this.proxy.emit(Events.Purchase.ticketPurchased, { customerId, ticketIds })
+        this.eventEmitter.emit('purchase.ticketPurchased', { customerId, ticketIds })
     }
 }

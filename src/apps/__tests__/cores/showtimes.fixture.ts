@@ -1,16 +1,15 @@
 import type { AppTestContext } from 'apps/__tests__/__helpers__'
 import { createAppTestContext } from 'apps/__tests__/__helpers__'
-import { ShowtimesClient, ShowtimesModule } from 'apps/cores'
+import { ShowtimesModule, ShowtimesService } from 'apps/cores'
 
-export type ShowtimesFixture = AppTestContext & { showtimesClient: ShowtimesClient }
+export type ShowtimesFixture = AppTestContext & { showtimesService: ShowtimesService }
 
 export async function createShowtimesFixture() {
     const ctx = await createAppTestContext({
-        imports: [ShowtimesModule],
-        providers: [ShowtimesClient]
+        imports: [ShowtimesModule]
     })
 
-    const showtimesClient = ctx.module.get(ShowtimesClient)
+    const showtimesService = ctx.module.get(ShowtimesService)
 
-    return { ...ctx, showtimesClient }
+    return { ...ctx, showtimesService }
 }

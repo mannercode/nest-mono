@@ -9,24 +9,19 @@ import {
     createTheater,
     createTickets
 } from 'apps/__tests__/__helpers__'
-import { BookingClient, BookingModule, PurchaseModule } from 'apps/applications'
+import { BookingModule, PurchaseModule } from 'apps/applications'
 import {
-    CustomersClient,
     CustomersModule,
-    MoviesClient,
     MoviesModule,
     PurchaseRecordsModule,
     Seatmap,
-    ShowtimesClient,
     ShowtimesModule,
-    TheatersClient,
     TheatersModule,
     TicketHoldingModule,
-    TicketsClient,
     TicketsModule
 } from 'apps/cores'
 import { BookingHttpController, CustomerJwtStrategy } from 'apps/gateway'
-import { AssetsClient, AssetsModule, PaymentsModule } from 'apps/infrastructures'
+import { AssetsModule, PaymentsModule } from 'apps/infrastructures'
 
 export type BookingFixture = AppTestContext
 
@@ -82,16 +77,7 @@ export async function createBookingFixture(): Promise<BookingFixture> {
             PurchaseModule,
             BookingModule
         ],
-        providers: [
-            CustomerJwtStrategy,
-            CustomersClient,
-            MoviesClient,
-            ShowtimesClient,
-            TheatersClient,
-            TicketsClient,
-            BookingClient,
-            AssetsClient
-        ]
+        providers: [CustomerJwtStrategy]
     })
 
     return { ...ctx }

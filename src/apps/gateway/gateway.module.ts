@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common'
-import {
-    BookingClient,
-    PurchaseClient,
-    RecommendationClient,
-    ShowtimeCreationClient
-} from 'apps/applications'
-import { CustomersClient, MoviesClient, PurchaseRecordsClient, TheatersClient } from 'apps/cores'
-import { CommonModule } from 'shared'
+import { EventEmitterModule } from '@nestjs/event-emitter'
+import { ApplicationsModule } from 'apps/applications'
+import { CoresModule } from 'apps/cores'
+import { InfrastructuresModule } from 'apps/infrastructures'
+import { CommonModule, MongooseConfigModule, RedisConfigModule } from 'shared'
 import {
     BookingHttpController,
     CustomerJwtStrategy,
@@ -28,18 +25,16 @@ import { HealthModule } from './modules'
         BookingHttpController,
         PurchaseHttpController
     ],
-    imports: [CommonModule, HealthModule],
-    providers: [
-        CustomerLocalStrategy,
-        CustomerJwtStrategy,
-        CustomersClient,
-        MoviesClient,
-        TheatersClient,
-        ShowtimeCreationClient,
-        BookingClient,
-        PurchaseRecordsClient,
-        RecommendationClient,
-        PurchaseClient
-    ]
+    imports: [
+        CommonModule,
+        MongooseConfigModule,
+        RedisConfigModule,
+        EventEmitterModule.forRoot(),
+        HealthModule,
+        CoresModule,
+        InfrastructuresModule,
+        ApplicationsModule
+    ],
+    providers: [CustomerLocalStrategy, CustomerJwtStrategy]
 })
 export class GatewayModule {}

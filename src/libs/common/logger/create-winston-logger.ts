@@ -3,7 +3,7 @@ import { defaultTo } from 'lodash'
 import { styleText } from 'node:util'
 import winston from 'winston'
 import DailyRotateFile from 'winston-daily-rotate-file'
-import type { HttpErrorLog, HttpSuccessLog, RpcErrorLog, RpcSuccessLog } from './types'
+import type { HttpErrorLog, HttpSuccessLog } from './types'
 
 function colorizeHttpMethod(method: string | undefined) {
     const normalizedMethod = defaultTo(method, 'METHOD').toUpperCase()
@@ -66,18 +66,6 @@ function formatHttpLogMessage(
     return `${timestamp} ${level} HTTP ${message} ${statusCode} ${method} ${url} ${body} `
 }
 
-function formatRpcLogMessage(
-    message: string,
-    level: string,
-    timestamp: string,
-    logDetails: RpcErrorLog | RpcSuccessLog
-) {
-    const coloredContext = styleText('magenta', JSON.stringify(logDetails.context, null, 2))
-    const coloredData = styleText('blueBright', JSON.stringify(logDetails.data, null, 2))
-
-    return `${timestamp} ${level} RPC ${message} ${coloredContext} ${coloredData}`
-}
-
 const consoleLogFormat = winston.format.combine(
     winston.format.timestamp({ format: 'HH:mm:ss' }),
     winston.format.printf((info) => {
@@ -90,8 +78,6 @@ const consoleLogFormat = winston.format.combine(
 
         if (logDetails?.contextType === 'http') {
             return formatHttpLogMessage(coloredMessage, coloredLevel, coloredTimestamp, logDetails)
-        } else if (logDetails?.contextType === 'rpc') {
-            return formatRpcLogMessage(coloredMessage, coloredLevel, coloredTimestamp, logDetails)
         } else {
             return formatGenericLogMessage(coloredMessage, coloredLevel, coloredTimestamp, rest)
         }

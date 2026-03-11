@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { MoviesClient, ShowtimesClient, TheatersClient } from 'apps/cores'
+import { MoviesService, ShowtimesService, TheatersService } from 'apps/cores'
 import { PaginationDto } from 'common'
 import { OrderDirection } from 'common'
 import { BulkCreateShowtimesDto, RequestShowtimeCreationResponse } from './dtos'
@@ -8,9 +8,9 @@ import { ShowtimeCreationWorkerService } from './services'
 @Injectable()
 export class ShowtimeCreationService {
     constructor(
-        private readonly theatersClient: TheatersClient,
-        private readonly moviesClient: MoviesClient,
-        private readonly showtimesClient: ShowtimesClient,
+        private readonly theatersService: TheatersService,
+        private readonly moviesService: MoviesService,
+        private readonly showtimesService: ShowtimesService,
         private readonly workerService: ShowtimeCreationWorkerService
     ) {}
 
@@ -21,17 +21,17 @@ export class ShowtimeCreationService {
     }
 
     async searchMoviesPage(searchDto: PaginationDto) {
-        return this.moviesClient.searchPage({
+        return this.moviesService.searchPage({
             ...searchDto,
             orderby: { direction: OrderDirection.Desc, name: 'releaseDate' }
         })
     }
 
     async searchShowtimes(theaterIds: string[]) {
-        return this.showtimesClient.search({ endTimeRange: { start: new Date() }, theaterIds })
+        return this.showtimesService.search({ endTimeRange: { start: new Date() }, theaterIds })
     }
 
     async searchTheatersPage(searchDto: PaginationDto) {
-        return this.theatersClient.searchPage(searchDto)
+        return this.theatersService.searchPage(searchDto)
     }
 }

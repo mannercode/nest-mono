@@ -13,17 +13,8 @@
             "autoAttachChildProcesses": true,
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
-            "env": { "TARGET_APP": "${input:apps}" },
             "skipFiles": ["<node_internals>/**"],
             "restart": true
-        }
-    ],
-    "inputs": [
-        {
-            "id": "apps",
-            "type": "pickString",
-            "options": ["gateway", "applications", "cores", "infrastructures"],
-            "description": "Select a app to debug"
         }
     ]
 }

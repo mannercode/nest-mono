@@ -1,29 +1,18 @@
 import { Module } from '@nestjs/common'
 import {
-    PurchaseRecordsClient,
-    ShowtimesClient,
-    TicketHoldingClient,
-    TicketsClient
+    PurchaseRecordsModule,
+    ShowtimesModule,
+    TicketHoldingModule,
+    TicketsModule
 } from 'apps/cores'
-import { PaymentsClient } from 'apps/infrastructures'
-import { PurchaseClient } from './purchase.client'
-import { PurchaseController } from './purchase.controller'
+import { PaymentsModule } from 'apps/infrastructures'
 import { PurchaseEvents } from './purchase.events'
 import { PurchaseService } from './purchase.service'
 import { TicketPurchaseService } from './services'
 
 @Module({
-    controllers: [PurchaseController],
-    providers: [
-        PurchaseService,
-        TicketPurchaseService,
-        PurchaseClient,
-        PurchaseEvents,
-        TicketsClient,
-        TicketHoldingClient,
-        PurchaseRecordsClient,
-        ShowtimesClient,
-        PaymentsClient
-    ]
+    exports: [PurchaseService],
+    imports: [TicketsModule, TicketHoldingModule, PurchaseRecordsModule, ShowtimesModule, PaymentsModule],
+    providers: [PurchaseService, TicketPurchaseService, PurchaseEvents]
 })
 export class PurchaseModule {}

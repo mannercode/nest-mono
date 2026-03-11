@@ -8,19 +8,15 @@ import {
     createShowtimes,
     createWatchRecord
 } from 'apps/__tests__/__helpers__'
-import { RecommendationClient, RecommendationModule } from 'apps/applications'
+import { RecommendationModule } from 'apps/applications'
 import {
-    CustomersClient,
     CustomersModule,
-    MoviesClient,
     MoviesModule,
-    ShowtimesClient,
     ShowtimesModule,
-    WatchRecordsClient,
     WatchRecordsModule
 } from 'apps/cores'
 import { CustomerJwtStrategy, MoviesHttpController } from 'apps/gateway'
-import { AssetsClient, AssetsModule } from 'apps/infrastructures'
+import { AssetsModule } from 'apps/infrastructures'
 import { DateUtil } from 'common'
 
 export type RecommendationFixture = AppTestContext & {}
@@ -36,15 +32,7 @@ export async function createRecommendationFixture(): Promise<RecommendationFixtu
             WatchRecordsModule,
             RecommendationModule
         ],
-        providers: [
-            CustomerJwtStrategy,
-            CustomersClient,
-            MoviesClient,
-            ShowtimesClient,
-            RecommendationClient,
-            WatchRecordsClient,
-            AssetsClient
-        ]
+        providers: [CustomerJwtStrategy]
     })
 
     return { ...ctx }

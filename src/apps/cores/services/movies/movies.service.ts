@@ -4,7 +4,7 @@ import {
     NotFoundException,
     UnprocessableEntityException
 } from '@nestjs/common'
-import { AssetsClient, CreateAssetDto } from 'apps/infrastructures'
+import { AssetsService, CreateAssetDto } from 'apps/infrastructures'
 import { ensure, mapDocToDto, pickIds } from 'common'
 import { uniq } from 'lodash'
 import { Rules } from 'shared'
@@ -20,7 +20,7 @@ export class MoviesService {
     constructor(
         private readonly moviesRepository: MoviesRepository,
         private readonly pendingAssetsRepository: MoviePendingAssetsRepository,
-        private readonly assetsClient: AssetsClient
+        private readonly assetsService: AssetsService
     ) {}
 
     async create(upsertDto: UpsertMovieDto) {
@@ -38,7 +38,7 @@ export class MoviesService {
             throw new BadRequestException(MovieErrors.UnsupportedAssetType(createDto.mimeType))
         }
 
-        const upload = await this.assetsClient.create(createDto)
+        const upload = await this.assetsService.create(createDto)
 
         await this.pendingAssetsRepository.addPendingAsset(movieId, upload.assetId)
 
@@ -51,7 +51,7 @@ export class MoviesService {
         }
 
         await this.pendingAssetsRepository.removePendingAsset(movieId, assetId)
-        await this.assetsClient.deleteMany([assetId])
+        await this.assetsService.deleteMany([assetId])
     }
 
     async deleteMany(movieIds: string[]): Promise<void> {
@@ -61,7 +61,7 @@ export class MoviesService {
             const assetIds = uniq(movies.flatMap((movie) => movie.assetIds))
 
             if (0 < assetIds.length) {
-                await this.assetsClient.deleteMany(assetIds)
+                await this.assetsService.deleteMany(assetIds)
             }
 
             await this.moviesRepository.deleteByIds(pickIds(movies))
@@ -90,13 +90,13 @@ export class MoviesService {
             throw new NotFoundException(MovieErrors.AssetNotFound(assetId))
         }
 
-        const isUploaded = await this.assetsClient.isUploadComplete(assetId)
+        const isUploaded = await this.assetsService.isUploadComplete(assetId)
 
         if (!isUploaded) {
             throw new UnprocessableEntityException(MovieErrors.AssetUploadInvalid(assetId))
         }
 
-        await this.assetsClient.finalizeUpload(assetId, {
+        await this.assetsService.finalizeUpload(assetId, {
             owner: { entityId: movieId, service: 'movies' }
         })
 
@@ -169,7 +169,7 @@ export class MoviesService {
         const assetIds = uniq(movies.flatMap((movie) => movie.assetIds))
 
         if (0 < assetIds.length) {
-            const assets = await this.assetsClient.getMany(assetIds)
+            const assets = await this.assetsService.getMany(assetIds)
 
             const assetUrlById = new Map<string, string>()
 

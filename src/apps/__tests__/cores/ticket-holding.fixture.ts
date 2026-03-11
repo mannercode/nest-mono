@@ -1,16 +1,15 @@
 import type { AppTestContext } from 'apps/__tests__/__helpers__'
 import { createAppTestContext } from 'apps/__tests__/__helpers__'
-import { TicketHoldingClient, TicketHoldingModule } from 'apps/cores'
+import { TicketHoldingModule, TicketHoldingService } from 'apps/cores'
 
-export type TicketHoldingFixture = AppTestContext & { ticketHoldingClient: TicketHoldingClient }
+export type TicketHoldingFixture = AppTestContext & { ticketHoldingService: TicketHoldingService }
 
 export async function createTicketHoldingFixture() {
     const ctx = await createAppTestContext({
-        imports: [TicketHoldingModule],
-        providers: [TicketHoldingClient]
+        imports: [TicketHoldingModule]
     })
 
-    const ticketHoldingClient = ctx.module.get(TicketHoldingClient)
+    const ticketHoldingService = ctx.module.get(TicketHoldingService)
 
-    return { ...ctx, ticketHoldingClient }
+    return { ...ctx, ticketHoldingService }
 }

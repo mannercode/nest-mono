@@ -1,19 +1,9 @@
 import { MongoDBContainer } from '@testcontainers/mongodb'
-import { NatsContainer } from '@testcontainers/nats'
 import fs from 'fs'
 import { GenericContainer } from 'testcontainers'
 import { getEnv, setEnv } from './jest.utils'
 
 // process.env.DEBUG="ioredis:*"
-
-async function setupNats() {
-    return new NatsContainer(getEnv('NATS_IMAGE'))
-        .withName('testlib-nats')
-        .withResourcesQuota({ memory: 0.25 })
-        .withSharedMemorySize(8 * 1024 * 1024)
-        .withReuse()
-        .start()
-}
 
 async function setupRedis() {
     return new GenericContainer(getEnv('REDIS_IMAGE'))
@@ -64,14 +54,12 @@ export default async function globalSetup() {
     const dirPath = getEnv('LOG_DIRECTORY')
     fs.mkdirSync(dirPath, { recursive: true })
 
-    const [nats, mongo, redis, minio] = await Promise.all([
-        setupNats(),
+    const [mongo, redis, minio] = await Promise.all([
         setupMongo(),
         setupRedis(),
         setupMinio()
     ])
 
-    setEnv('TESTLIB_NATS_OPTIONS', JSON.stringify(nats.getConnectionOptions()))
     // Use directConnection to prevent MongoServerSelectionError: getaddrinfo ENOTFOUND on container hostnames
     // MongoServerSelectionError: getaddrinfo ENOTFOUND 같은 에러를 방지하기 위해 directConnection 사용
     setEnv('TESTLIB_MONGO_URI', `${mongo.getConnectionString()}?directConnection=true`)

@@ -16,7 +16,7 @@ describe('WatchRecordsService', () => {
         // 생성된 시청 기록을 반환한다
         it('returns the created watch record', async () => {
             const createDto = buildCreateWatchRecordDto()
-            const watchRecord = await fix.watchRecordsClient.create(createDto)
+            const watchRecord = await fix.watchRecordsService.create(createDto)
 
             expect(watchRecord).toEqual({ ...createDto, id: expect.any(String) })
         })
@@ -48,7 +48,7 @@ describe('WatchRecordsService', () => {
                 query: SearchWatchRecordsPageDto,
                 expectedRecords: WatchRecordDto[]
             ) => {
-                const recordsPage = await fix.watchRecordsClient.searchPage(query)
+                const recordsPage = await fix.watchRecordsService.searchPage(query)
                 expect(recordsPage).toEqual(buildExpectedPage(expectedRecords))
             }
 

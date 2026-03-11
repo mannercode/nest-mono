@@ -20,7 +20,7 @@ describe('TicketHoldingService', () => {
             it('returns true', async () => {
                 const holdDto = buildHoldTicketsDto()
 
-                const isHeld = await fix.ticketHoldingClient.holdTickets(holdDto)
+                const isHeld = await fix.ticketHoldingService.holdTickets(holdDto)
 
                 expect(isHeld).toBe(true)
             })
@@ -33,13 +33,13 @@ describe('TicketHoldingService', () => {
 
             beforeEach(async () => {
                 const holdDto = buildHoldTicketsDto({ customerId, ticketIds })
-                await fix.ticketHoldingClient.holdTickets(holdDto)
+                await fix.ticketHoldingService.holdTickets(holdDto)
             })
 
             // 동일한 ticketIds를 다시 보유할 때 true를 반환한다
             it('returns true for re-holding the same ticketIds', async () => {
                 const holdDto = buildHoldTicketsDto({ customerId, ticketIds })
-                const isHeld = await fix.ticketHoldingClient.holdTickets(holdDto)
+                const isHeld = await fix.ticketHoldingService.holdTickets(holdDto)
 
                 expect(isHeld).toBe(true)
             })
@@ -47,7 +47,7 @@ describe('TicketHoldingService', () => {
             // 다른 고객에 대해 false를 반환한다
             it('returns false for another customer', async () => {
                 const holdDto = buildHoldTicketsDto({ customerId: oid(0xc2), ticketIds })
-                const isHeld = await fix.ticketHoldingClient.holdTickets(holdDto)
+                const isHeld = await fix.ticketHoldingService.holdTickets(holdDto)
 
                 expect(isHeld).toBe(false)
             })
@@ -59,14 +59,14 @@ describe('TicketHoldingService', () => {
                         customerId,
                         ticketIds: [oid(0xb0), oid(0xb1)]
                     })
-                    await fix.ticketHoldingClient.holdTickets(holdDto)
+                    await fix.ticketHoldingService.holdTickets(holdDto)
                 })
 
                 // 이전에 보유한 ticketIds를 해제한다
                 it('releases the previously held ticketIds', async () => {
                     const holdDto = buildHoldTicketsDto({ customerId: oid(0xc2), ticketIds })
 
-                    const isHeld = await fix.ticketHoldingClient.holdTickets(holdDto)
+                    const isHeld = await fix.ticketHoldingService.holdTickets(holdDto)
 
                     expect(isHeld).toBe(true)
                 })
@@ -80,7 +80,7 @@ describe('TicketHoldingService', () => {
                 toAny(Rules).Ticket.holdDurationInMs = 1000
 
                 const holdDto = buildHoldTicketsDto({ customerId: oid(0xc1) })
-                await fix.ticketHoldingClient.holdTickets(holdDto)
+                await fix.ticketHoldingService.holdTickets(holdDto)
 
                 await sleep(1000 + 500)
             })
@@ -88,7 +88,7 @@ describe('TicketHoldingService', () => {
             // 다른 고객에 대해 true를 반환한다
             it('returns true for another customer', async () => {
                 const holdDto = buildHoldTicketsDto({ customerId: oid(0xc2) })
-                const isHeld = await fix.ticketHoldingClient.holdTickets(holdDto)
+                const isHeld = await fix.ticketHoldingService.holdTickets(holdDto)
 
                 expect(isHeld).toBe(true)
             })
@@ -108,7 +108,7 @@ describe('TicketHoldingService', () => {
                         showtimeIds.map(async (showtimeId) => {
                             const holdResults = await Promise.all(
                                 customerIds.map((customerId) =>
-                                    fix.ticketHoldingClient.holdTickets({
+                                    fix.ticketHoldingService.holdTickets({
                                         customerId,
                                         showtimeId,
                                         ticketIds
@@ -135,12 +135,12 @@ describe('TicketHoldingService', () => {
 
             beforeEach(async () => {
                 holdDto = buildHoldTicketsDto()
-                await fix.ticketHoldingClient.holdTickets(holdDto)
+                await fix.ticketHoldingService.holdTickets(holdDto)
             })
 
             // 보유 중인 ticketIds를 반환한다
             it('returns the held ticketIds', async () => {
-                const heldTicketIds = await fix.ticketHoldingClient.searchHeldTicketIds(
+                const heldTicketIds = await fix.ticketHoldingService.searchHeldTicketIds(
                     holdDto.showtimeId,
                     holdDto.customerId
                 )
@@ -158,14 +158,14 @@ describe('TicketHoldingService', () => {
                 toAny(Rules).Ticket.holdDurationInMs = 1000
 
                 holdDto = buildHoldTicketsDto()
-                await fix.ticketHoldingClient.holdTickets(holdDto)
+                await fix.ticketHoldingService.holdTickets(holdDto)
 
                 await sleep(1000 + 500)
             })
 
             // 빈 배열을 반환한다
             it('returns an empty array', async () => {
-                const heldTicketIds = await fix.ticketHoldingClient.searchHeldTicketIds(
+                const heldTicketIds = await fix.ticketHoldingService.searchHeldTicketIds(
                     holdDto.showtimeId,
                     holdDto.customerId
                 )
@@ -182,13 +182,13 @@ describe('TicketHoldingService', () => {
 
             beforeEach(async () => {
                 holdDto = buildHoldTicketsDto()
-                await fix.ticketHoldingClient.holdTickets(holdDto)
+                await fix.ticketHoldingService.holdTickets(holdDto)
             })
 
             // 보유된 티켓을 해제하면 응답을 반환하지 않는다
             it('returns no response for releasing held tickets', async () => {
                 await expect(
-                    fix.ticketHoldingClient.releaseTickets(holdDto.showtimeId, holdDto.customerId)
+                    fix.ticketHoldingService.releaseTickets(holdDto.showtimeId, holdDto.customerId)
                 ).resolves.toBeUndefined()
             })
         })
@@ -198,7 +198,7 @@ describe('TicketHoldingService', () => {
             // 응답을 반환하지 않는다
             it('returns no response', async () => {
                 await expect(
-                    fix.ticketHoldingClient.releaseTickets(oid(0xa0), oid(0xc1))
+                    fix.ticketHoldingService.releaseTickets(oid(0xa0), oid(0xc1))
                 ).resolves.toBeUndefined()
             })
         })

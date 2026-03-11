@@ -4,10 +4,6 @@ export function getRedisTestConnection() {
     return Env.getString('TESTLIB_REDIS_URL')
 }
 
-export function getNatsTestConnection() {
-    return JSON.parse(Env.getString('TESTLIB_NATS_OPTIONS'))
-}
-
 export function getMongoTestConnection() {
     return {
         dbName: Env.getString('TESTLIB_MONGO_DATABASE'),

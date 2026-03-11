@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer'
 import { IsEnum, IsNotEmpty, IsString, ValidateNested } from 'class-validator'
 import { Seat } from '../../theaters'
 import { TicketStatus } from '../models'
@@ -13,7 +12,6 @@ export class CreateTicketDto {
     sagaId: string
 
     @IsNotEmpty()
-    @Type(() => Seat)
     @ValidateNested()
     seat: Seat
 

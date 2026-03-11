@@ -19,9 +19,9 @@ describe('PaymentsService', () => {
         it('cancels the payment', async () => {
             const payment = await createPayment(fix)
 
-            await fix.paymentsClient.cancel(payment.id)
+            await fix.paymentsService.cancel(payment.id)
 
-            const promise = fix.paymentsClient.getMany([payment.id])
+            const promise = fix.paymentsService.getMany([payment.id])
 
             await expect(promise).rejects.toMatchObject({
                 message: Errors.Mongoose.MultipleDocumentsNotFound([payment.id]).message,
@@ -35,7 +35,7 @@ describe('PaymentsService', () => {
         it('returns the created payment', async () => {
             const createDto = buildCreatePaymentDto()
 
-            const payment = await fix.paymentsClient.create(createDto)
+            const payment = await fix.paymentsService.create(createDto)
 
             expect(payment).toEqual({
                 ...createDto,
@@ -61,7 +61,7 @@ describe('PaymentsService', () => {
 
             // paymentIds에 대한 결제를 반환한다
             it('returns payments for the paymentIds', async () => {
-                const fetchedPayments = await fix.paymentsClient.getMany(pickIds(payments))
+                const fetchedPayments = await fix.paymentsService.getMany(pickIds(payments))
 
                 expect(fetchedPayments).toEqual(expect.arrayContaining(payments))
             })
@@ -71,7 +71,7 @@ describe('PaymentsService', () => {
         describe('when the paymentIds include a non-existent paymentId', () => {
             // 404 Not Found를 던진다
             it('throws 404 Not Found', async () => {
-                const promise = fix.paymentsClient.getMany([nullObjectId])
+                const promise = fix.paymentsService.getMany([nullObjectId])
 
                 await expect(promise).rejects.toMatchObject({
                     message: Errors.Mongoose.MultipleDocumentsNotFound([nullObjectId]).message,

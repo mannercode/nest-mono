@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common'
 import { CacheModule } from 'common'
 import { getProjectId, RedisConfigModule } from 'shared'
-import { TicketHoldingController } from './ticket-holding.controller'
 import { TicketHoldingService } from './ticket-holding.service'
 
 @Module({
-    controllers: [TicketHoldingController],
+    exports: [TicketHoldingService],
     imports: [
         CacheModule.register({
             name: 'ticket-holding',

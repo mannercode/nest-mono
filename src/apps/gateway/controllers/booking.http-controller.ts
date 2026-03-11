@@ -9,7 +9,7 @@ import {
     Req,
     UseGuards
 } from '@nestjs/common'
-import { BookingClient } from 'apps/applications'
+import { BookingService } from 'apps/applications'
 import { LatLong } from 'common'
 import { DateUtil, ParseLatLongQuery } from 'common'
 import { CustomerJwtAuthGuard } from './guards'
@@ -17,11 +17,11 @@ import { CustomerAuthRequest } from './types'
 
 @Controller('booking')
 export class BookingHttpController {
-    constructor(private readonly bookingClient: BookingClient) {}
+    constructor(private readonly bookingService: BookingService) {}
 
     @Get('showtimes/:showtimeId/tickets')
     async getTicketsForShowtime(@Param('showtimeId') showtimeId: string) {
-        return this.bookingClient.getTickets(showtimeId)
+        return this.bookingService.getTickets(showtimeId)
     }
 
     @HttpCode(HttpStatus.OK)
@@ -33,7 +33,7 @@ export class BookingHttpController {
         @Req() req: CustomerAuthRequest
     ) {
         const customerId = req.user.customerId
-        return this.bookingClient.holdTickets({ customerId, showtimeId, ticketIds })
+        return this.bookingService.holdTickets({ customerId, showtimeId, ticketIds })
     }
 
     @Get('movies/:movieId/theaters/:theaterId/showdates')
@@ -41,7 +41,7 @@ export class BookingHttpController {
         @Param('movieId') movieId: string,
         @Param('theaterId') theaterId: string
     ) {
-        return this.bookingClient.searchShowdates({ movieId, theaterId })
+        return this.bookingService.searchShowdates({ movieId, theaterId })
     }
 
     @Get('movies/:movieId/theaters/:theaterId/showdates/:showdate/showtimes')
@@ -50,7 +50,7 @@ export class BookingHttpController {
         @Param('theaterId') theaterId: string,
         @Param('showdate') showdate: string
     ) {
-        return this.bookingClient.searchShowtimes({
+        return this.bookingService.searchShowtimes({
             movieId,
             showdate: DateUtil.fromYMD(showdate),
             theaterId
@@ -62,6 +62,6 @@ export class BookingHttpController {
         @Param('movieId') movieId: string,
         @ParseLatLongQuery('latLong') latLong: LatLong
     ) {
-        return this.bookingClient.searchTheaters({ latLong, movieId })
+        return this.bookingService.searchTheaters({ latLong, movieId })
     }
 }

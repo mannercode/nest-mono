@@ -1,7 +1,6 @@
 import { BadRequestException } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
 import { CommonErrors } from 'common'
-import { withTestId } from 'testlib'
 import type { PaginationFixture } from './pagination.fixture'
 import { PaginationDto, PaginationErrors } from '..'
 
@@ -56,26 +55,6 @@ describe('PaginationDto', () => {
                     .get('/pagination')
                     .query({ orderby: 'name:wrong' })
                     .badRequest(CommonErrors.Pagination.DirectionInvalid())
-            })
-        })
-    })
-
-    describe('RPC controller', () => {
-        // 요청이 유효할 때
-        describe('when the request is valid', () => {
-            let input: Record<string, any>
-
-            beforeEach(() => {
-                const skip = 2
-                const take = 3
-                input = { orderby: { direction: 'asc', name: 'name' }, skip, take }
-            })
-
-            // PaginationDto를 처리한다
-            it('handles PaginationDto', async () => {
-                await fix.rpcClient.expectRequest(withTestId('getRpcPagination'), input, {
-                    response: input
-                })
             })
         })
     })

@@ -1,9 +1,7 @@
-import { Type } from 'class-transformer'
 import { IsDate, IsNotEmpty, IsString } from 'class-validator'
 
 export class CreateShowtimeDto {
     @IsDate()
-    @Type(() => Date)
     endTime: Date
 
     @IsNotEmpty()
@@ -15,7 +13,6 @@ export class CreateShowtimeDto {
     sagaId: string
 
     @IsDate()
-    @Type(() => Date)
     startTime: Date
 
     @IsNotEmpty()

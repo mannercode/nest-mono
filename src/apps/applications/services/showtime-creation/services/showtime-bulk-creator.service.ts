@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { ShowtimeDto, ShowtimesClient, TheaterDto, TheatersClient, TicketsClient } from 'apps/cores'
+import { ShowtimeDto, ShowtimesService, TheaterDto, TheatersService, TicketsService } from 'apps/cores'
 import { Seatmap, TicketStatus } from 'apps/cores'
 import { DateUtil, Require } from 'common'
 import { uniq } from 'lodash'
@@ -8,9 +8,9 @@ import { BulkCreateShowtimesDto } from '../dtos'
 @Injectable()
 export class ShowtimeBulkCreatorService {
     constructor(
-        private readonly theatersClient: TheatersClient,
-        private readonly showtimesClient: ShowtimesClient,
-        private readonly ticketsClient: TicketsClient
+        private readonly theatersService: TheatersService,
+        private readonly showtimesService: ShowtimesService,
+        private readonly ticketsService: TicketsService
     ) {}
 
     async create(createDto: BulkCreateShowtimesDto, sagaId: string) {
@@ -34,8 +34,8 @@ export class ShowtimeBulkCreatorService {
             }))
         )
 
-        await this.showtimesClient.createMany(createDtos)
-        const showtimes = await this.showtimesClient.search({ sagaIds: [sagaId] })
+        await this.showtimesService.createMany(createDtos)
+        const showtimes = await this.showtimesService.search({ sagaIds: [sagaId] })
         return showtimes
     }
 
@@ -43,7 +43,7 @@ export class ShowtimeBulkCreatorService {
         let totalCount = 0
 
         const theaterIds = uniq(showtimes.map((showtime) => showtime.theaterId))
-        const theaters = await this.theatersClient.getMany(theaterIds)
+        const theaters = await this.theatersService.getMany(theaterIds)
 
         const theatersById = new Map<string, TheaterDto>()
         theaters.forEach((theater) => theatersById.set(theater.id, theater))
@@ -63,7 +63,7 @@ export class ShowtimeBulkCreatorService {
                     theaterId: showtime.theaterId
                 }))
 
-                const { count } = await this.ticketsClient.createMany(createTicketDtos)
+                const { count } = await this.ticketsService.createMany(createTicketDtos)
                 totalCount += count
             })
         )

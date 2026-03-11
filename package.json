@@ -3,24 +3,18 @@
     "version": "0.0.1",
     "private": true,
     "comments": {
-        "scripts": {
-            "TARGET_APP": [
-                "TARGET_APP must match a Nest project key defined in nest-cli.json.",
-                "Example: TARGET_APP=gateway npm run build"
-            ],
-            "apps:*": "App stack scripts for this repo (root-level docker compose).",
-            "infra:*": [
-                "Local shared infrastructure scripts",
-                "docker compose under infra/local using '.env' and '.env.infra'."
-            ]
-        }
+        "apps:*": "App stack scripts for this repo (root-level docker compose).",
+        "infra:*": [
+            "Local shared infrastructure scripts",
+            "docker compose under infra/local using '.env' and '.env.infra'."
+        ]
     },
     "scripts": {
-        "start": "node _output/dist/${TARGET_APP}/index.js",
-        "build": "nest build ${TARGET_APP} -b webpack",
-        "debug": "nest start ${TARGET_APP} --watch",
+        "start": "node _output/dist/index.js",
+        "build": "nest build -b webpack",
+        "debug": "nest start --watch",
         "test": "jest --no-cache --coverage --roots \"<rootDir>/${TEST_ROOT:-src}\" --collectCoverageFrom \"${TEST_ROOT:-src}/**/*.ts\"",
-        "test:e2e": "npm run infra:reset && npm run apps:reset && bash tests/e2e/run-specs.sh && npm run apps:down",
+        "test:e2e": "npm run infra:reset && npm run apps:reset && bash tests/e2e/run-all.sh && npm run apps:down",
         "format": "eslint src/ --fix && prettier --write src/",
         "lint": "tsc -p tsconfig.json --noEmit && eslint src/ --max-warnings=0 && prettier --check src/",
         "apps:down": "docker compose down -v -t 0 --remove-orphans",
@@ -41,9 +35,9 @@
         "@nestjs/common": "^11.1.14",
         "@nestjs/config": "^4.0.3",
         "@nestjs/core": "^11.1.14",
+        "@nestjs/event-emitter": "^3.0.1",
         "@nestjs/jwt": "^11.0.2",
         "@nestjs/mapped-types": "^2.1.0",
-        "@nestjs/microservices": "^11.1.14",
         "@nestjs/mongoose": "^11.0.4",
         "@nestjs/passport": "^11.0.5",
         "@nestjs/platform-express": "^11.1.14",
@@ -60,7 +54,6 @@
         "lodash": "^4.17.23",
         "mongoose": "^9.2.2",
         "mongoose-lean-virtuals": "^2.1.0",
-        "nats": "^2.29.3",
         "passport-jwt": "^4.0.1",
         "passport-local": "^1.0.0",
         "reflect-metadata": "^0.2.2",
@@ -75,7 +68,6 @@
         "@nestjs/schematics": "^11.0.9",
         "@nestjs/testing": "^11.1.14",
         "@testcontainers/mongodb": "^11.12.0",
-        "@testcontainers/nats": "^11.12.0",
         "@types/bcrypt": "^6.0.0",
         "@types/compression": "^1.8.1",
         "@types/express": "^5.0.6",

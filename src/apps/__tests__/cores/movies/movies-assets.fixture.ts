@@ -1,5 +1,5 @@
 import type { TestAsset } from 'apps/__tests__/__helpers__'
-import type { AssetsClient } from 'apps/infrastructures'
+import type { AssetsService } from 'apps/infrastructures'
 import type { TestContext } from 'testlib'
 import { buildCreateAssetDto, testAssets, uploadAsset } from 'apps/__tests__/__helpers__'
 import type { MoviesBaseContext } from './create-movies-context'
@@ -7,7 +7,7 @@ import { createMoviesContext } from './create-movies-context'
 
 export type MoviesAssetsFixture = MoviesBaseContext & {
     asset: TestAsset
-    assetsClient: AssetsClient
+    assetsService: AssetsService
 }
 
 export { createUnpublishedMovie } from './create-movies-context'
@@ -25,10 +25,10 @@ export async function createMovieAsset(ctx: TestContext, movieId: string, file: 
 export async function createMoviesAssetsFixture() {
     const ctx = await createMoviesContext()
 
-    const { AssetsClient } = await import('apps/infrastructures')
-    const assetsClient = ctx.module.get(AssetsClient)
+    const { AssetsService } = await import('apps/infrastructures')
+    const assetsService = ctx.module.get(AssetsService)
 
-    return { ...ctx, asset: testAssets.image, assetsClient }
+    return { ...ctx, asset: testAssets.image, assetsService }
 }
 
 export async function uploadAndFinalizeMovieAsset(ctx: TestContext, movieId: string) {

@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
-import { AssetsClient } from 'apps/infrastructures'
+import { AssetsModule } from 'apps/infrastructures'
 import { MongooseConfigModule } from 'shared'
 import { Movie, MoviePendingAsset, MoviePendingAssetSchema, MovieSchema } from './models'
 import { MoviePendingAssetsRepository } from './movie-pending-assets.repository'
-import { MoviesController } from './movies.controller'
 import { MoviesRepository } from './movies.repository'
 import { MoviesService } from './movies.service'
 
 @Module({
-    controllers: [MoviesController],
+    exports: [MoviesService],
     imports: [
         MongooseModule.forFeature(
             [{ name: Movie.name, schema: MovieSchema }],
@@ -18,8 +17,9 @@ import { MoviesService } from './movies.service'
         MongooseModule.forFeature(
             [{ name: MoviePendingAsset.name, schema: MoviePendingAssetSchema }],
             MongooseConfigModule.connectionName
-        )
+        ),
+        AssetsModule
     ],
-    providers: [MoviesService, MoviesRepository, MoviePendingAssetsRepository, AssetsClient]
+    providers: [MoviesService, MoviesRepository, MoviePendingAssetsRepository]
 })
 export class MoviesModule {}

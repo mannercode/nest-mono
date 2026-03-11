@@ -3,14 +3,13 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { PassportModule } from '@nestjs/passport'
 import { JwtAuthModule, Time } from 'common'
 import { AppConfigService, getProjectId, MongooseConfigModule, RedisConfigModule } from 'shared'
-import { CustomersController } from './customers.controller'
 import { CustomersRepository } from './customers.repository'
 import { CustomersService } from './customers.service'
 import { Customer, CustomerSchema } from './models'
 import { CustomerAuthenticationService } from './services'
 
 @Module({
-    controllers: [CustomersController],
+    exports: [CustomersService],
     imports: [
         MongooseModule.forFeature(
             [{ name: Customer.name, schema: CustomerSchema }],

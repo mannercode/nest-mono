@@ -8,26 +8,19 @@ import {
     createShowtimes,
     createTickets
 } from 'apps/__tests__/__helpers__'
-import { PurchaseClient, PurchaseModule } from 'apps/applications'
+import { PurchaseModule } from 'apps/applications'
 import {
-    CustomersClient,
     CustomersModule,
-    MoviesClient,
     MoviesModule,
     PurchaseItemType,
-    PurchaseRecordsClient,
     PurchaseRecordsModule,
-    ShowtimesClient,
     ShowtimesModule,
-    TheatersClient,
     TheatersModule,
-    TicketHoldingClient,
     TicketHoldingModule,
-    TicketsClient,
     TicketsModule
 } from 'apps/cores'
 import { PurchaseHttpController } from 'apps/gateway'
-import { AssetsClient, AssetsModule, PaymentsModule } from 'apps/infrastructures'
+import { AssetsModule, PaymentsModule } from 'apps/infrastructures'
 import { DateUtil, pickIds } from 'common'
 import { oid, toAny } from 'testlib'
 
@@ -47,17 +40,6 @@ export async function createPurchaseFixture(): Promise<PurchaseFixture> {
             TicketHoldingModule,
             PaymentsModule,
             PurchaseModule
-        ],
-        providers: [
-            CustomersClient,
-            MoviesClient,
-            PurchaseRecordsClient,
-            ShowtimesClient,
-            TheatersClient,
-            TicketsClient,
-            TicketHoldingClient,
-            PurchaseClient,
-            AssetsClient
         ]
     })
 

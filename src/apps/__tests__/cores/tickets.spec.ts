@@ -20,7 +20,7 @@ describe('TicketsService', () => {
         it('creates tickets', async () => {
             const createDtos = [buildCreateTicketDto({ sagaId: oid(0x1) })]
 
-            const { success } = await fix.ticketsClient.createMany(createDtos)
+            const { success } = await fix.ticketsService.createMany(createDtos)
 
             expect(success).toBe(true)
         })
@@ -54,28 +54,28 @@ describe('TicketsService', () => {
 
             // sagaIds로 필터링된 티켓을 반환한다
             it('returns tickets filtered by sagaIds', async () => {
-                const tickets = await fix.ticketsClient.search({ sagaIds: [sagaId] })
+                const tickets = await fix.ticketsService.search({ sagaIds: [sagaId] })
 
                 expect(tickets).toEqual([ticketForSaga])
             })
 
             // movieIds로 필터링된 티켓을 반환한다
             it('returns tickets filtered by movieIds', async () => {
-                const tickets = await fix.ticketsClient.search({ movieIds: [movieId] })
+                const tickets = await fix.ticketsService.search({ movieIds: [movieId] })
 
                 expect(tickets).toEqual([ticketForMovie])
             })
 
             // theaterIds로 필터링된 티켓을 반환한다
             it('returns tickets filtered by theaterIds', async () => {
-                const tickets = await fix.ticketsClient.search({ theaterIds: [theaterId] })
+                const tickets = await fix.ticketsService.search({ theaterIds: [theaterId] })
 
                 expect(tickets).toEqual([ticketForTheater])
             })
 
             // showtimeIds로 필터링된 티켓을 반환한다
             it('returns tickets filtered by showtimeIds', async () => {
-                const tickets = await fix.ticketsClient.search({ showtimeIds: [showtimeId] })
+                const tickets = await fix.ticketsService.search({ showtimeIds: [showtimeId] })
 
                 expect(tickets).toEqual([ticketForShowtime])
             })
@@ -85,7 +85,7 @@ describe('TicketsService', () => {
         describe('when the filter is empty', () => {
             // 400 Bad Request를 던진다
             it('throws 400 Bad Request', async () => {
-                const promise = fix.ticketsClient.search({})
+                const promise = fix.ticketsService.search({})
 
                 await expect(promise).rejects.toMatchObject({
                     message: Errors.Mongoose.FiltersRequired().message,
@@ -110,7 +110,7 @@ describe('TicketsService', () => {
 
             // 수정된 티켓을 반환한다
             it('returns the updated tickets', async () => {
-                const updatedTickets = await fix.ticketsClient.updateStatusMany(
+                const updatedTickets = await fix.ticketsService.updateStatusMany(
                     pickIds(tickets),
                     TicketStatus.Sold
                 )
@@ -132,12 +132,12 @@ describe('TicketsService', () => {
                 const createdTickets = await createTickets(fix, createDtos)
 
                 const soldTickets = createdTickets.slice(0, soldCount)
-                await fix.ticketsClient.updateStatusMany(pickIds(soldTickets), TicketStatus.Sold)
+                await fix.ticketsService.updateStatusMany(pickIds(soldTickets), TicketStatus.Sold)
             })
 
             // showtimeIds에 대한 판매 통계를 반환한다
             it('returns sales stats for the showtimeIds', async () => {
-                const ticketSales = await fix.ticketsClient.aggregateSales({
+                const ticketSales = await fix.ticketsService.aggregateSales({
                     showtimeIds: [showtimeId]
                 })
 

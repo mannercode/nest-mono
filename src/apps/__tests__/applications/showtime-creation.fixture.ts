@@ -1,23 +1,21 @@
 import type { AppTestContext as TestContext } from 'apps/__tests__/__helpers__'
 import { createAppTestContext } from 'apps/__tests__/__helpers__'
-import { ShowtimeCreationClient, ShowtimeCreationModule } from 'apps/applications'
+import { ShowtimeCreationModule } from 'apps/applications'
 import {
-    MoviesClient,
     MoviesModule,
-    ShowtimesClient,
     ShowtimesModule,
-    TheatersClient,
+    ShowtimesService,
     TheatersModule,
-    TicketsClient,
-    TicketsModule
+    TicketsModule,
+    TicketsService
 } from 'apps/cores'
 import { ShowtimeCreationHttpController } from 'apps/gateway'
-import { AssetsClient, AssetsModule } from 'apps/infrastructures'
+import { AssetsModule } from 'apps/infrastructures'
 import { Json } from 'common'
 
 export type ShowtimeCreationFixture = TestContext & {
-    showtimesClient: ShowtimesClient
-    ticketsClient: TicketsClient
+    showtimesService: ShowtimesService
+    ticketsService: TicketsService
 }
 
 export async function createShowtimeCreationFixture(): Promise<ShowtimeCreationFixture> {
@@ -30,21 +28,13 @@ export async function createShowtimeCreationFixture(): Promise<ShowtimeCreationF
             ShowtimesModule,
             TicketsModule,
             ShowtimeCreationModule
-        ],
-        providers: [
-            MoviesClient,
-            TheatersClient,
-            ShowtimesClient,
-            TicketsClient,
-            ShowtimeCreationClient,
-            AssetsClient
         ]
     })
 
-    const showtimesClient = ctx.module.get(ShowtimesClient)
-    const ticketsClient = ctx.module.get(TicketsClient)
+    const showtimesService = ctx.module.get(ShowtimesService)
+    const ticketsService = ctx.module.get(TicketsService)
 
-    return { ...ctx, showtimesClient, ticketsClient }
+    return { ...ctx, showtimesService, ticketsService }
 }
 
 export function waitForCompletion(ctx: TestContext, status: string) {

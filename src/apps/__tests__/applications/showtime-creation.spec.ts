@@ -123,7 +123,7 @@ describe('ShowtimeCreationService', () => {
                 const { body } = await createPromise
                 const { createdShowtimeCount } = await waitForCompletion(fix, 'succeeded')
 
-                const createdShowtimes = await fix.showtimesClient.search({
+                const createdShowtimes = await fix.showtimesService.search({
                     sagaIds: [body.sagaId]
                 })
                 expect(createdShowtimes).toHaveLength(createdShowtimeCount)
@@ -134,7 +134,7 @@ describe('ShowtimeCreationService', () => {
                 const { body } = await createPromise
                 const { createdTicketCount } = await waitForCompletion(fix, 'succeeded')
 
-                const createdTickets = await fix.ticketsClient.search({ sagaIds: [body.sagaId] })
+                const createdTickets = await fix.ticketsService.search({ sagaIds: [body.sagaId] })
                 expect(createdTickets).toHaveLength(createdTicketCount)
             })
         })

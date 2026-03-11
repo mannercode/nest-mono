@@ -1,10 +1,9 @@
-import type { MicroserviceOptions } from '@nestjs/microservices'
 import type { QueueOptions } from 'bullmq'
 import type Redis from 'ioredis'
 import type { HttpTestContext, ModuleMetadataEx } from 'testlib'
 import { BullModule } from '@nestjs/bullmq'
 import { ConfigService } from '@nestjs/config'
-import { Transport } from '@nestjs/microservices'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 import { SchedulerRegistry } from '@nestjs/schedule'
 import { AppLoggerService } from 'common'
 import compression from 'compression'
@@ -25,6 +24,7 @@ export async function createAppTestContext(metadata: ModuleMetadataEx) {
         CommonModule,
         MongooseConfigModule,
         RedisConfigModule,
+        EventEmitterModule.forRoot(),
         BullModule.forRootAsync('queue', {
             inject: [RedisConfigModule.moduleName],
             useFactory(redis: Redis) {
@@ -38,7 +38,7 @@ export async function createAppTestContext(metadata: ModuleMetadataEx) {
 
     const ctx = await createHttpTestContext({
         configureApp: async (app) => {
-            const { http, nats } = app.get(AppConfigService)
+            const { http } = app.get(AppConfigService)
 
             app.use(compression())
             app.use(express.json({ limit: http.requestPayloadLimit }))
@@ -47,16 +47,6 @@ export async function createAppTestContext(metadata: ModuleMetadataEx) {
                 const logger = app.get(AppLoggerService)
                 app.useLogger(logger)
             }
-
-            app.connectMicroservice<MicroserviceOptions>(
-                {
-                    options: { queue: getProjectId(), servers: nats.servers },
-                    transport: Transport.NATS
-                },
-                { inheritAppConfig: true }
-            )
-
-            await app.startAllMicroservices()
         },
         ...metadata
     })
@@ -78,7 +68,7 @@ export async function createAppTestContext(metadata: ModuleMetadataEx) {
  * const configMock = createConfigServiceMock({ S3_ENDPOINT: s3.endpoint })
  * const ctx = await createAppTestContext({
  *     imports: [AssetsModule],
- *     providers: [AssetsClient],
+ *     providers: [],
  *     overrideProviders: [configMock]
  * })
  */
