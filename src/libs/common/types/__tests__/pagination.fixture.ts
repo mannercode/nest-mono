@@ -6,10 +6,7 @@ import { PaginationDto } from '..'
 
 export const maxTakeValue = 50
 
-export type PaginationFixture = {
-    httpClient: HttpTestClient
-    teardown: () => Promise<void>
-}
+export type PaginationFixture = { httpClient: HttpTestClient; teardown: () => Promise<void> }
 
 @Controller()
 class SamplesController {

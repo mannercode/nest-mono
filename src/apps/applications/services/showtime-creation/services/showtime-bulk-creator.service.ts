@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common'
-import { ShowtimeDto, ShowtimesService, TheaterDto, TheatersService, TicketsService } from 'apps/cores'
+import {
+    ShowtimeDto,
+    ShowtimesService,
+    TheaterDto,
+    TheatersService,
+    TicketsService
+} from 'apps/cores'
 import { Seatmap, TicketStatus } from 'apps/cores'
 import { DateUtil, Require } from 'common'
 import { uniq } from 'lodash'

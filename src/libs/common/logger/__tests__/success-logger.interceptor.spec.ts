@@ -28,7 +28,6 @@ describe('SuccessLoggerInterceptor', () => {
                 })
             })
         })
-
     })
 
     // LOGGING_EXCLUDE_HTTP_PATHS에 요청 경로가 포함될 때
@@ -49,5 +48,4 @@ describe('SuccessLoggerInterceptor', () => {
             expect(fix.spyVerbose).toHaveBeenCalledTimes(0)
         })
     })
-
 })

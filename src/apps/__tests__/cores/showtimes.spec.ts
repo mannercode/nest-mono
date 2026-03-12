@@ -185,7 +185,9 @@ describe('ShowtimesService', () => {
 
         // movieIds로 필터링된 theaterIds를 반환한다
         it('returns theaterIds filtered by movieIds', async () => {
-            const theaterIds = await fix.showtimesService.searchTheaterIds({ movieIds: [oid(0xaa)] })
+            const theaterIds = await fix.showtimesService.searchTheaterIds({
+                movieIds: [oid(0xaa)]
+            })
 
             expect(theaterIds).toEqual([oid(0xb1), oid(0xb2)])
         })

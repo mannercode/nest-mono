@@ -9,12 +9,7 @@ import {
     createWatchRecord
 } from 'apps/__tests__/__helpers__'
 import { RecommendationModule } from 'apps/applications'
-import {
-    CustomersModule,
-    MoviesModule,
-    ShowtimesModule,
-    WatchRecordsModule
-} from 'apps/cores'
+import { CustomersModule, MoviesModule, ShowtimesModule, WatchRecordsModule } from 'apps/cores'
 import { CustomerJwtStrategy, MoviesHttpController } from 'apps/gateway'
 import { AssetsModule } from 'apps/infrastructures'
 import { DateUtil } from 'common'

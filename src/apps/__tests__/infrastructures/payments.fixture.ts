@@ -5,9 +5,7 @@ import { PaymentsModule, PaymentsService } from 'apps/infrastructures'
 export type PaymentsFixture = AppTestContext & { paymentsService: PaymentsService }
 
 export async function createPaymentsFixture() {
-    const ctx = await createAppTestContext({
-        imports: [PaymentsModule]
-    })
+    const ctx = await createAppTestContext({ imports: [PaymentsModule] })
 
     const paymentsService = ctx.module.get(PaymentsService)
 
