@@ -11,12 +11,11 @@
     ],
     "remoteUser": "node",
     "mounts": [
-        "source=${localEnv:HOME}/.codex,target=/home/node/.codex,type=bind",
         "source=${localEnv:HOME}/.claude,target=/home/node/.claude,type=bind",
         "source=${localEnv:HOME}/.claude.json,target=/home/node/.claude.json,type=bind"
     ],
     "initializeCommand": {
-        "prepare-mounts": "mkdir -p ${localEnv:HOME}/.codex ${localEnv:HOME}/.claude ${localEnv:HOME}/.copilot",
+        "prepare-mounts": "mkdir -p ${localEnv:HOME}/.claude",
         "prepare-files": "touch ${localEnv:HOME}/.claude.json"
     },
     "postCreateCommand": { "husky": "husky", "ci": "npm ci" },
@@ -54,13 +53,11 @@
                 "remote.downloadExtensionsLocally": true,
                 "prettier.enableDebugLogs": true,
                 "livePreview.portNumber": 5010,
-                "typescript.tsc.autoDetect": "off",
-                "typescript.disableAutomaticTypeAcquisition": true,
-                "typescript.format.enable": false,
-                "javascript.format.enable": false,
-                "javascript.validate.enable": false,
-                "javascript.updateImportsOnFileMove.enabled": "never",
-                "typescript.updateImportsOnFileMove.enabled": "never",
+                "js/ts.tsc.autoDetect": "off",
+                "js/ts.disableAutomaticTypeAcquisition": true,
+                "js/ts.format.enable": false,
+                "js/ts.validate.enable": false,
+                "js/ts.updateImportsOnFileMove.enabled": "never",
                 "editor.defaultFormatter": "esbenp.prettier-vscode",
                 "[dockerfile]": { "editor.defaultFormatter": "ms-azuretools.vscode-containers" },
                 "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
