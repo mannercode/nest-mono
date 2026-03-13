@@ -1,16 +1,18 @@
+> **English** | [한국어](docs/ko/README.md)
+
 # nest-mono
 
-NestJS 기반 모놀리식 아키텍처 템플릿. 영화 예매 도메인을 예제로 삼아 계층형 아키텍처의 다양한 개념과 기술을 검증한다.
+A monolithic architecture template based on NestJS. Uses a movie ticketing domain as an example to validate various concepts and techniques of layered architecture.
 
 ## Documentation
 
-- [Design Guide](docs/design-guide.md) — 시스템 아키텍처, 설계 원칙
-- [Domain Glossary](docs/glossary.md) — 도메인 용어 정의
-- [Entity Design](docs/designs/entities.md) — 엔터티 속성, 관계, ER 다이어그램
-- [Showtime Creation](docs/designs/showtime-creation.md) — 상영시간 생성 흐름
-- [Ticket Purchase](docs/designs/tickets-purchase.md) — 티켓 구매 흐름
-- [Decisions](docs/decisions.md) — 기술 선택 근거
-- [Development Setup](docs/development.md) — 환경 파일, Dev Container, VS Code 설정
+- [Design Guide](docs/en/design-guide.md) — System architecture, design principles
+- [Domain Glossary](docs/en/glossary.md) — Domain term definitions
+- [Entity Design](docs/en/designs/entities.md) — Entity attributes, relationships, ER diagram
+- [Showtime Creation](docs/en/designs/showtime-creation.md) — Showtime creation flow
+- [Ticket Purchase](docs/en/designs/tickets-purchase.md) — Ticket purchase flow
+- [Decisions](docs/en/decisions.md) — Technical decision rationale
+- [Development Setup](docs/en/development.md) — Environment files, Dev Container, VS Code configuration
 
 ## Tech Stack
 
@@ -46,7 +48,7 @@ npm ci
 npm run infra:reset
 ```
 
-관리 콘솔 및 모니터링 대시보드(mongo-express, RedisInsight, Grafana)와 함께 실행하려면:
+To run with admin consoles and monitoring dashboards (mongo-express, RedisInsight, Grafana):
 
 ```bash
 npm run infra:gui
@@ -60,35 +62,35 @@ npm test
 
 ## Scripts
 
-| Script                | Description                                                       |
-| --------------------- | ----------------------------------------------------------------- |
-| `npm run build`       | 프로덕션 빌드                                                     |
-| `npm run start`       | 빌드된 앱 실행                                                    |
-| `npm run debug`       | Watch 모드로 개발 실행                                            |
-| `npm test`            | 단위 테스트 실행 (coverage 포함)                                  |
-| `npm run test:e2e`    | E2E 테스트 실행 (인프라 + 앱 자동 재시작)                         |
-| `npm run lint`        | TypeScript 타입 체크, ESLint, Prettier 검사                       |
-| `npm run format`      | ESLint 자동 수정 및 Prettier 포맷팅                               |
-| `npm run infra:reset` | 인프라 초기화 (down + up + wait)                                  |
-| `npm run infra:gui`   | 관리 콘솔 포함 인프라 실행 (mongo-express, RedisInsight, Grafana) |
-| `npm run apps:reset`  | 앱 서비스 초기화 (down + up + wait)                               |
+| Script                | Description                                                          |
+| --------------------- | -------------------------------------------------------------------- |
+| `npm run build`       | Production build                                                     |
+| `npm run start`       | Run the built application                                            |
+| `npm run debug`       | Run in watch mode for development                                    |
+| `npm test`            | Run unit tests (with coverage)                                       |
+| `npm run test:e2e`    | Run E2E tests (auto-restart infra + app)                             |
+| `npm run lint`        | TypeScript type check, ESLint, Prettier check                        |
+| `npm run format`      | ESLint auto-fix and Prettier formatting                              |
+| `npm run infra:reset` | Reset infrastructure (down + up + wait)                              |
+| `npm run infra:gui`   | Run infra with admin consoles (mongo-express, RedisInsight, Grafana) |
+| `npm run apps:reset`  | Reset app services (down + up + wait)                                |
 
 ## Testing
 
 ### Unit Tests
 
-[Testcontainers](https://testcontainers.com/)를 사용하여 MongoDB, Redis, MinIO를 실제 컨테이너로 띄워 테스트한다.
+Uses [Testcontainers](https://testcontainers.com/) to spin up real MongoDB, Redis, and MinIO containers for testing.
 
 ```bash
 npm test
 
-# 특정 서비스만 테스트
+# Test a specific service only
 TEST_ROOT=src/apps/__tests__/cores npm test
 ```
 
 ### E2E Tests
 
-전체 인프라와 앱을 Docker Compose로 실행한 후 HTTP API를 통해 시나리오를 검증한다. `curl`과 `jq`가 필요하다.
+Runs the full infrastructure and application via Docker Compose, then validates scenarios through the HTTP API. Requires `curl` and `jq`.
 
 ```bash
 npm run test:e2e
@@ -99,49 +101,49 @@ npm run test:e2e
 ```
 src/
 ├── apps/
-│   ├── gateway/          # HTTP API 컨트롤러, 인증
-│   ├── applications/     # 비즈니스 로직 서비스 (BullMQ)
-│   ├── cores/            # 도메인 모델, 리포지토리
-│   ├── infrastructures/  # 외부 서비스 연동 (결제, 파일)
-│   ├── shared/           # 공통 설정, 비즈니스 규칙(Rules), 파이프, 미들웨어
-│   └── __tests__/        # 단위/통합 테스트
+│   ├── gateway/          # HTTP API controllers, authentication
+│   ├── applications/     # Business logic services (BullMQ)
+│   ├── cores/            # Domain models, repositories
+│   ├── infrastructures/  # External service integrations (payments, files)
+│   ├── shared/           # Common config, business rules (Rules), pipes, middleware
+│   └── __tests__/        # Unit/integration tests
 ├── libs/
-│   ├── common/           # 공통 라이브러리 (로깅, DB, 캐시)
-│   └── testlib/          # 테스트 유틸리티
-├── tests/e2e/            # E2E 테스트 스펙
-└── infra/local/          # 로컬 인프라 Docker Compose
+│   ├── common/           # Common libraries (logging, DB, cache)
+│   └── testlib/          # Test utilities
+├── tests/e2e/            # E2E test specs
+└── infra/local/          # Local infrastructure Docker Compose
 ```
 
 ## Key Concepts
 
 ### Layered Architecture
 
-코드를 Gateway, Applications, Cores, Infrastructures 4개 계층으로 분리한다. 각 계층은 겹치지 않는 책임을 가지며, ESLint `no-restricted-imports`로 의존 방향을 단방향으로 강제하여 순환 의존을 방지한다.
+Code is separated into four layers: Gateway, Applications, Cores, and Infrastructures. Each layer has non-overlapping responsibilities. ESLint `no-restricted-imports` enforces unidirectional dependency flow and prevents circular dependencies.
 
 ### HTTP Layer
 
-인증, 요청 검증, 로깅 같은 횡단 관심사를 Gateway 계층의 HTTP 컨트롤러에서 처리한다. 내부 서비스는 이런 관심사를 알 필요 없이 비즈니스 로직에만 집중할 수 있다.
+Cross-cutting concerns such as authentication, request validation, and logging are handled in the Gateway layer's HTTP controllers. Internal services can focus solely on business logic without awareness of these concerns.
 
 ### Async Job Processing
 
-상영 일정 일괄 생성처럼 오래 걸리는 작업은 BullMQ 큐에 넣고 즉시 응답한다. 작업 실패 시 자동 재시도되며, 진행 상태를 이벤트로 클라이언트에 전달한다.
+Long-running tasks like batch showtime creation are enqueued to BullMQ and respond immediately. Failed jobs are automatically retried, and progress status is delivered to clients via events.
 
 ### Event-Driven Architecture
 
-티켓 구매 같은 이벤트는 EventEmitter2로 발행한다. 발행자는 구독자의 존재를 모르므로 느슨하게 결합되며, 구독자를 추가해도 발행 측 코드를 수정할 필요가 없다.
+Events such as ticket purchases are published via EventEmitter2. Publishers are unaware of subscribers, enabling loose coupling. Adding new subscribers requires no changes to publisher code.
 
 ### Repository Pattern
 
-Mongoose 쿼리를 공통 리포지토리로 추상화하여 서비스마다 같은 방식으로 데이터에 접근한다. 에러 처리, 페이지네이션, 트랜잭션 로직이 한 곳에 집중되므로 중복이 줄고 일관성이 유지된다.
+Mongoose queries are abstracted into common repositories so every service accesses data in the same way. Error handling, pagination, and transaction logic are centralized, reducing duplication and maintaining consistency.
 
 ### Clustered Infrastructure
 
-MongoDB 레플리카셋, Redis 클러스터를 로컬 환경에서도 구성하여 프로덕션과 동일한 토폴로지에서 개발·테스트한다. 단일 노드에서는 발견되지 않는 클러스터 동기화, 페일오버 관련 문제를 사전에 검증할 수 있다.
+MongoDB replica sets and Redis clusters are configured even in the local environment to develop and test with the same topology as production. This allows early detection of cluster synchronization and failover issues that do not surface on single-node setups.
 
 ### Health Check
 
-HTTP 헬스체크 엔드포인트를 제공하고 Docker 헬스체크와 연동한다. 컨테이너 오케스트레이터가 이를 통해 서비스 상태를 감지하고 비정상 컨테이너를 자동 재시작한다.
+Provides HTTP health check endpoints integrated with Docker health checks. Container orchestrators use these to detect service status and automatically restart unhealthy containers.
 
 ### Testing Strategy
 
-Testcontainers로 실제 MongoDB, Redis, MinIO 컨테이너를 띄워 테스트한다. Mock 대신 실제 인프라를 사용하므로 트랜잭션, 인덱스, TTL 같은 동작을 그대로 검증할 수 있다. E2E 테스트는 전체 스택을 Docker Compose로 실행하여 HTTP API 단위로 시나리오를 검증한다.
+Tests use Testcontainers to spin up real MongoDB, Redis, and MinIO containers. Using real infrastructure instead of mocks allows verifying behaviors like transactions, indexes, and TTL as-is. E2E tests run the full stack via Docker Compose and validate scenarios at the HTTP API level.

@@ -1,3 +1,5 @@
+> [English](../en/design-guide.md) | **한국어**
+
 # 백엔드 설계 가이드
 
 ---

@@ -1,3 +1,5 @@
+> [English](../../en/designs/entities.md) | **한국어**
+
 # Entity Design
 
 모든 엔터티는 다음 필드를 공통으로 갖는다.

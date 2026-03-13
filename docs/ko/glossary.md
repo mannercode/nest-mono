@@ -1,3 +1,5 @@
+> [English](../en/glossary.md) | **한국어**
+
 # Domain Glossary
 
 영화 예매 도메인에서 사용하는 주요 용어를 정리한다.

@@ -1,61 +1,63 @@
+> **English** | [한국어](../../ko/designs/tickets-purchase.md)
+
 # Tickets Purchase
 
-## 1. 유스케이스 명세서
+## 1. Use Case Specification
 
-**목표**: 고객이 원하는 영화의 좌석을 선택하고 티켓을 구매하기
+**Goal**: Customer selects seats for a desired movie and purchases tickets
 
-**액터**: 고객
+**Actor**: Customer
 
-**선행 조건**:
+**Preconditions**:
 
-- 고객은 시스템에 로그인되어 있어야 한다.
-- 구매할 영화의 상영시간과 좌석이 사용 가능해야 한다.
+- The customer must be logged into the system.
+- The showtime and seats for the movie to purchase must be available.
 
-**기본 흐름**:
+**Main Flow**:
 
-1. 시스템은 현재 상영 중인 영화 목록을 추천순으로 제공한다.
-1. 고객은 원하는 영화를 선택한다.
-1. 시스템은 해당 영화를 상영 중인 극장 목록을 거리순으로 제공한다.
-1. 고객은 극장을 선택한다.
-1. 시스템은 선택한 극장의 상영일 목록을 제공한다.
-1. 고객은 원하는 상영일을 선택한다.
-1. 시스템은 해당 상영일의 상영시간 목록과 잔여 좌석 수를 제공한다.
-1. 고객은 원하는 상영시간을 선택한다.
-1. 시스템은 선택 가능한 좌석 목록을 제공한다.
-1. 고객은 하나 이상의 좌석을 선택한다. 선택한 좌석은 10분간 선점된다.
-1. 고객은 결제 정보를 입력하고 구매를 확정한다.
-1. 시스템은 결제를 처리하고 구매 완료 정보를 반환한다.
+1. The system provides a list of currently showing movies sorted by recommendation.
+1. The customer selects a desired movie.
+1. The system provides a list of theaters showing the movie, sorted by distance.
+1. The customer selects a theater.
+1. The system provides a list of showdates for the selected theater.
+1. The customer selects a desired showdate.
+1. The system provides a list of showtimes for the selected date with remaining seat counts.
+1. The customer selects a desired showtime.
+1. The system provides a list of available seats.
+1. The customer selects one or more seats. Selected seats are held for 10 minutes.
+1. The customer enters payment information and confirms the purchase.
+1. The system processes the payment and returns the completed purchase information.
 
-**대안 흐름**:
+**Alternative Flows**:
 
-- 티켓이 이미 선점된 경우: 시스템은 선점 실패를 반환한다.
-- 결제 처리 후 티켓 상태 업데이트에 실패한 경우: 시스템은 티켓 상태를 롤백하고 예외를 던진다.
+- If a ticket is already held: The system returns a hold failure.
+- If ticket status update fails after payment processing: The system rolls back the ticket status and throws an exception.
 
-**비즈니스 규칙**:
+**Business Rules**:
 
-- 고객은 한 번에 최대 10장의 티켓을 구매할 수 있다. (`Rules.Ticket.maxTicketsPerPurchase = 10`)
-- 상영 시작 30분 전까지만 온라인으로 티켓을 구매할 수 있다. (`Rules.Ticket.purchaseCutoffMinutes = 30`)
-- 티켓 선점 유효 시간은 10분이다. (`Rules.Ticket.holdDurationInMs = 10m`)
-- 구매 시점에 티켓이 선점 상태여야 한다.
+- A customer can purchase a maximum of 10 tickets at a time. (`Rules.Ticket.maxTicketsPerPurchase = 10`)
+- Tickets can only be purchased online up to 30 minutes before showtime. (`Rules.Ticket.purchaseCutoffMinutes = 30`)
+- Ticket hold duration is 10 minutes. (`Rules.Ticket.holdDurationInMs = 10m`)
+- Tickets must be in held status at the time of purchase.
 
 ---
 
-## 2. 시퀀스 다이어그램
+## 2. Sequence Diagrams
 
-### 2.1. 영화 추천
+### 2.1. Movie Recommendation
 
 ```plantuml
 @startuml
 actor Customer
 
-Customer -> Frontend: 영화 예매 시스템 접속
-    Frontend -> Backend: 추천 영화 목록 요청\nGET /movies/recommended
+Customer -> Frontend: Access movie ticketing system
+    Frontend -> Backend: Request recommended movies\nGET /movies/recommended
         Backend -> Recommendation: searchRecommendedMovies(customerId?)
             Recommendation -> Showtimes: searchMovieIds({startTimeRange: {start: now + 30m}})
             Recommendation <-- Showtimes: movieIds[]
             Recommendation -> Movies: getMany(movieIds)
             Recommendation <-- Movies: MovieDto[]
-            opt customerId 존재
+            opt customerId exists
                 Recommendation -> WatchRecords: searchPage({customerId, orderby: watchDate DESC, take: 50})
                 Recommendation <-- WatchRecords: { items: WatchRecordDto[] }
                 Recommendation -> Movies: getMany(watchedMovieIds)
@@ -63,23 +65,23 @@ Customer -> Frontend: 영화 예매 시스템 접속
             end
             Recommendation -> Recommendation: MovieRecommender.recommend\n(showingMovies, watchedMovies)
             note right
-                1순위: 장르 일치
-                2순위: 최신 개봉일
+                Priority 1: Genre match
+                Priority 2: Latest release date
             end note
         Backend <-- Recommendation: MovieDto[]
     Frontend <-- Backend: movies[]
-Customer <-- Frontend: 추천 영화 목록 제공
+Customer <-- Frontend: Provide recommended movie list
 @enduml
 ```
 
-### 2.2. 극장 / 날짜 / 상영시간 선택
+### 2.2. Theater / Date / Showtime Selection
 
 ```plantuml
 @startuml
 actor Customer
 
-Customer -> Frontend: 영화 선택
-    Frontend -> Backend: 상영 극장 목록 요청\nGET /booking/movies/{movieId}/theaters?latLong=...
+Customer -> Frontend: Select movie
+    Frontend -> Backend: Request theater list\nGET /booking/movies/{movieId}/theaters?latLong=...
         Backend -> Booking: searchTheaters({movieId, latLong})
             Booking -> Showtimes: searchTheaterIds({movieIds: [movieId]})
             Booking <-- Showtimes: theaterIds[]
@@ -88,21 +90,21 @@ Customer -> Frontend: 영화 선택
             Booking -> Booking: sortTheatersByDistance(theaters, latLong)
         Backend <-- Booking: TheaterDto[]
     Frontend <-- Backend: theaters[]
-Customer <-- Frontend: 상영 극장 목록 제공
+Customer <-- Frontend: Provide theater list
 
-Customer -> Frontend: 극장 선택
-    Frontend -> Backend: 상영일 목록 요청\nGET /booking/movies/{movieId}/theaters/{theaterId}/showdates
+Customer -> Frontend: Select theater
+    Frontend -> Backend: Request showdate list\nGET /booking/movies/{movieId}/theaters/{theaterId}/showdates
         Backend -> Booking: searchShowdates({movieId, theaterId})
             Booking -> Showtimes: searchShowdates({movieIds: [movieId], theaterIds: [theaterId]})
             Booking <-- Showtimes: Date[]
         Backend <-- Booking: Date[]
     Frontend <-- Backend: showdates[]
-Customer <-- Frontend: 상영일 목록 제공
+Customer <-- Frontend: Provide showdate list
 
-Customer -> Frontend: 상영일 선택
-    Frontend -> Backend: 상영시간 목록 요청\nGET /booking/movies/{movieId}/theaters/{theaterId}/showdates/{showdate}/showtimes
+Customer -> Frontend: Select showdate
+    Frontend -> Backend: Request showtime list\nGET /booking/movies/{movieId}/theaters/{theaterId}/showdates/{showdate}/showtimes
         Backend -> Booking: searchShowtimes({movieId, theaterId, showdate})
-            Booking -> Showtimes: search({movieIds, theaterIds, startTimeRange: [하루 범위]})
+            Booking -> Showtimes: search({movieIds, theaterIds, startTimeRange: [day range]})
             Booking <-- Showtimes: ShowtimeDto[]
             Booking -> Tickets: aggregateSales({showtimeIds})
             Booking <-- Tickets: TicketSalesDto[]
@@ -117,18 +119,18 @@ Customer -> Frontend: 상영일 선택
             Booking -> Booking: generateShowtimesForBooking(showtimes, ticketSales)
         Backend <-- Booking: ShowtimeWithSalesDto[]
     Frontend <-- Backend: showtimesWithSales[]
-Customer <-- Frontend: 상영시간 + 잔여 좌석 수 제공
+Customer <-- Frontend: Provide showtimes + remaining seat counts
 @enduml
 ```
 
-### 2.3. 좌석 선택 및 선점
+### 2.3. Seat Selection and Holding
 
 ```plantuml
 @startuml
 actor Customer
 
-Customer -> Frontend: 상영시간 선택
-    Frontend -> Backend: 티켓 목록 요청\nGET /booking/showtimes/{showtimeId}/tickets
+Customer -> Frontend: Select showtime
+    Frontend -> Backend: Request ticket list\nGET /booking/showtimes/{showtimeId}/tickets
         Backend -> Booking: getTickets(showtimeId)
             Booking -> Showtimes: allExist([showtimeId])
             Booking <-- Showtimes: boolean
@@ -136,10 +138,10 @@ Customer -> Frontend: 상영시간 선택
             Booking <-- Tickets: TicketDto[]
         Backend <-- Booking: TicketDto[]
     Frontend <-- Backend: tickets[]
-Customer <-- Frontend: 좌석 목록 제공
+Customer <-- Frontend: Provide seat list
 
-Customer -> Frontend: 좌석 선택
-    Frontend -> Backend: 티켓 선점\nPATCH /booking/showtimes/{showtimeId}/tickets
+Customer -> Frontend: Select seats
+    Frontend -> Backend: Hold tickets\nPATCH /booking/showtimes/{showtimeId}/tickets
     note right
     HoldTicketsDto {
         customerId: string
@@ -150,26 +152,26 @@ Customer -> Frontend: 좌석 선택
         Backend -> Booking: holdTickets(dto)
             Booking -> TicketHolding: holdTickets(dto)
             note right
-                Redis Lua 스크립트로 원자적 처리
-                ttl = Rules.Ticket.holdDurationInMs (10분)
+                Atomic processing via Redis Lua script
+                ttl = Rules.Ticket.holdDurationInMs (10 min)
             end note
             Booking <-- TicketHolding: boolean (success)
         Backend <-- Booking: { success: true }
-    Frontend <-- Backend: 선점 완료
-Customer <-- Frontend: 좌석 선점 완료 안내
+    Frontend <-- Backend: Hold complete
+Customer <-- Frontend: Seat hold confirmation
 @enduml
 ```
 
-### 2.4. 결제 및 구매 완료
+### 2.4. Payment and Purchase Completion
 
-Temporal 워크플로우(`purchaseWorkflow`)가 구매 흐름 전체를 오케스트레이션한다. 각 단계는 Temporal Activity로 실행되며, 실패 시 보상 스택을 역순으로 실행한다.
+The Temporal workflow (`purchaseWorkflow`) orchestrates the entire purchase flow. Each step executes as a Temporal Activity, and on failure, the compensation stack is executed in reverse order.
 
 ```plantuml
 @startuml
 actor Customer
 
-Customer -> Frontend: 결제 정보 입력 및 구매 확정
-    Frontend -> Backend: 결제 요청\nPOST /purchases
+Customer -> Frontend: Enter payment info and confirm purchase
+    Frontend -> Backend: Payment request\nPOST /purchases
     note right
     CreatePurchaseDto {
         customerId: string
@@ -190,51 +192,51 @@ Customer -> Frontend: 결제 정보 입력 및 구매 확정
                     TicketPurchase -> Showtimes: getMany(showtimeIds)
                     TicketPurchase <-- Showtimes: ShowtimeDto[]
                     TicketPurchase -> TicketPurchase: validateTicketCount(ticketItems)
-                    note right: 최대 10장
+                    note right: Max 10 tickets
                     TicketPurchase -> TicketPurchase: validatePurchaseTime(showtimes)
-                    note right: 상영 시작 30분 전까지
+                    note right: Up to 30 min before showtime
                     TicketPurchase -> TicketHolding: searchHeldTicketIds(showtimeId, customerId)
                     TicketPurchase <-- TicketHolding: heldTicketIds[]
-                    TicketPurchase -> TicketPurchase: 모든 티켓이 선점 상태인지 확인
-                Temporal <-- TicketPurchase: void (검증 완료)
+                    TicketPurchase -> TicketPurchase: Verify all tickets are in held status
+                Temporal <-- TicketPurchase: void (validation complete)
                 deactivate TicketPurchase
 
                 Temporal -> Payments: [Activity] createPayment(totalPrice, customerId)
                 Temporal <-- Payments: PaymentDto
-                note right: 보상 스택에 cancelPayment 등록
+                note right: Register cancelPayment in compensation stack
 
                 Temporal -> PurchaseRecords: [Activity] createPurchaseRecord({...dto, paymentId})
                 Temporal <-- PurchaseRecords: PurchaseRecordDto
-                note right: 보상 스택에 deletePurchaseRecord 등록
+                note right: Register deletePurchaseRecord in compensation stack
 
                 Temporal -> TicketPurchase: [Activity] completePurchase(dto)
                 activate TicketPurchase
                     TicketPurchase -> Tickets: updateStatusMany(ticketIds, TicketStatus.Sold)
                     TicketPurchase <-- Tickets: TicketDto[]
                     TicketPurchase -> Events: emitTicketPurchased(customerId, ticketIds)
-                    note left: WatchRecords가 이 이벤트를 구독한다
+                    note left: WatchRecords subscribes to this event
                 Temporal <-- TicketPurchase: void
                 deactivate TicketPurchase
             end box
 
             Purchase <-- Temporal: PurchaseRecordDto
         Backend <-- Purchase: PurchaseRecordDto
-    Frontend <-- Backend: 구매 완료 정보
-Customer <-- Frontend: 구매 완료 안내
+    Frontend <-- Backend: Purchase completion info
+Customer <-- Frontend: Purchase confirmation
 @enduml
 ```
 
 ---
 
-## 3. 롤백 처리 (Temporal 보상 스택)
+## 3. Rollback Handling (Temporal Compensation Stack)
 
-워크플로우 실행 중 예외가 발생하면 보상 스택을 역순으로 실행한다.
+When an exception occurs during workflow execution, the compensation stack is executed in reverse order.
 
 ```plantuml
 @startuml
-[o-> Workflow: 예외 발생
+[o-> Workflow: Exception occurred
 
-Workflow -> Workflow: 보상 스택 역순 실행
+Workflow -> Workflow: Execute compensation stack in reverse
     Workflow -> PurchaseRecords: [Compensation] deletePurchaseRecord(id)
     Workflow <-- PurchaseRecords: void
     Workflow -> Payments: [Compensation] cancelPayment(paymentId)
@@ -248,4 +250,4 @@ Workflow -> Workflow: throw error
 @enduml
 ```
 
-> 보상 스택은 성공한 Activity만 역순으로 취소한다. 예를 들어 `createPayment`까지만 성공했다면 `cancelPayment`만 실행되고 `deletePurchaseRecord`는 실행되지 않는다.
+> The compensation stack only cancels successfully completed Activities in reverse order. For example, if only `createPayment` succeeded, only `cancelPayment` is executed and `deletePurchaseRecord` is not.

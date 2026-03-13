@@ -1,15 +1,17 @@
+> **English** | [한국어](docs/ko/SECURITY.md)
+
 # Security Policy
 
-이 저장소는 NestJS MSA 아키텍처 참고 구현체(오픈소스 템플릿)입니다.
+This repository is an open-source template — a reference implementation of NestJS monolithic architecture.
 
-## 취약점 신고
+## Reporting Vulnerabilities
 
-보안 취약점을 발견하면 GitHub Issue를 통해 신고해 주세요.
+If you discover a security vulnerability, please report it via GitHub Issues.
 
-신고 시 다음 내용을 포함해 주세요.
+When reporting, please include the following:
 
-- 취약점 설명
-- 재현 단계
-- 잠재적 영향 범위
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact scope
 
-신고된 취약점은 검토 후 합리적인 시간 내에 응답합니다.
+Reported vulnerabilities will be reviewed and responded to within a reasonable timeframe.
