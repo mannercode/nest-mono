@@ -26,8 +26,11 @@
         "paths": {
             "common": ["src/libs/common/index"],
             "testlib": ["src/libs/testlib/index"],
-            "shared": ["src/apps/shared/index"],
-            "apps/*": ["src/apps/*"]
+            "shared": ["src/shared/index"],
+            "applications": ["src/applications/index"],
+            "cores": ["src/cores/index"],
+            "infrastructures": ["src/infrastructures/index"],
+            "controllers": ["src/controllers/index"]
         }
     },
     "include": ["src/**/*"]

@@ -13,7 +13,7 @@ const nodeBuiltinModulePattern = `^(?:node:)?(?:${[
     .sort()
     .map(escapeForRegex)
     .join('|')})(?:/.*)?$`
-const internalAliasPattern = '^(?:apps(?:/.*)?|common|shared|testlib)$'
+const internalAliasPattern = '^(?:applications|controllers|cores|infrastructures|common|shared|testlib)$'
 const dependencyIgnorePatterns = ['^\\.', nodeBuiltinModulePattern, internalAliasPattern]
 const sourceDependencyOptions = {
     packageDir: __dirname,
@@ -104,7 +104,7 @@ module.exports = [
         files: [
             'src/**/__tests__/**/*.ts',
             'src/libs/testlib/**/*.ts',
-            'src/apps/**/development.ts'
+            'src/development.ts'
         ],
         languageOptions: { globals: { ...baseGlobals, ...globals.jest } },
         plugins: { jest: jestPlugin },
@@ -127,16 +127,16 @@ module.exports = [
         }
     },
     {
-        files: ['src/apps/gateway/**/*.ts'],
+        files: ['src/controllers/**/*.ts'],
         rules: {
             'no-restricted-imports': [
                 'warn',
                 {
                     patterns: [
                         {
-                            group: ['apps/gateway', 'apps/gateway/**'],
+                            group: ['controllers', 'controllers/**'],
                             message:
-                                'Use relative imports within gateway to avoid ancestor barrel cycles.'
+                                'Use relative imports within controllers to avoid ancestor barrel cycles.'
                         }
                     ]
                 }
@@ -144,20 +144,20 @@ module.exports = [
         }
     },
     {
-        files: ['src/apps/applications/**/*.ts'],
+        files: ['src/applications/**/*.ts'],
         rules: {
             'no-restricted-imports': [
                 'warn',
                 {
                     patterns: [
                         {
-                            group: ['apps/applications', 'apps/applications/**'],
+                            group: ['applications', 'applications/**'],
                             message:
                                 'Use relative imports within applications to avoid ancestor barrel cycles.'
                         },
                         {
-                            group: ['apps/gateway', 'apps/gateway/**'],
-                            message: 'Layering rule: applications must not depend on gateway.'
+                            group: ['controllers', 'controllers/**'],
+                            message: 'Layering rule: applications must not depend on controllers.'
                         }
                     ]
                 }
@@ -165,26 +165,26 @@ module.exports = [
         }
     },
     {
-        files: ['src/apps/cores/**/*.ts'],
+        files: ['src/cores/**/*.ts'],
         rules: {
             'no-restricted-imports': [
                 'warn',
                 {
                     patterns: [
                         {
-                            group: ['apps/cores', 'apps/cores/**'],
+                            group: ['cores', 'cores/**'],
                             message:
                                 'Use relative imports within cores to avoid ancestor barrel cycles.'
                         },
                         {
                             group: [
-                                'apps/gateway',
-                                'apps/gateway/**',
-                                'apps/applications',
-                                'apps/applications/**'
+                                'controllers',
+                                'controllers/**',
+                                'applications',
+                                'applications/**'
                             ],
                             message:
-                                'Layering rule: cores must not depend on gateway or applications.'
+                                'Layering rule: cores must not depend on controllers or applications.'
                         }
                     ]
                 }
@@ -192,28 +192,28 @@ module.exports = [
         }
     },
     {
-        files: ['src/apps/infrastructures/**/*.ts'],
+        files: ['src/infrastructures/**/*.ts'],
         rules: {
             'no-restricted-imports': [
                 'warn',
                 {
                     patterns: [
                         {
-                            group: ['apps/infrastructures', 'apps/infrastructures/**'],
+                            group: ['infrastructures', 'infrastructures/**'],
                             message:
                                 'Use relative imports within infrastructures to avoid ancestor barrel cycles.'
                         },
                         {
                             group: [
-                                'apps/gateway',
-                                'apps/gateway/**',
-                                'apps/applications',
-                                'apps/applications/**',
-                                'apps/cores',
-                                'apps/cores/**'
+                                'controllers',
+                                'controllers/**',
+                                'applications',
+                                'applications/**',
+                                'cores',
+                                'cores/**'
                             ],
                             message:
-                                'Layering rule: infrastructures must not depend on gateway, applications, or cores.'
+                                'Layering rule: infrastructures must not depend on controllers, applications, or cores.'
                         }
                     ]
                 }
@@ -221,7 +221,7 @@ module.exports = [
         }
     },
     {
-        files: ['src/apps/shared/**/*.ts'],
+        files: ['src/shared/**/*.ts'],
         rules: {
             'no-restricted-imports': [
                 'warn',
@@ -234,14 +234,14 @@ module.exports = [
                         },
                         {
                             group: [
-                                'apps/gateway',
-                                'apps/gateway/**',
-                                'apps/applications',
-                                'apps/applications/**',
-                                'apps/cores',
-                                'apps/cores/**',
-                                'apps/infrastructures',
-                                'apps/infrastructures/**'
+                                'controllers',
+                                'controllers/**',
+                                'applications',
+                                'applications/**',
+                                'cores',
+                                'cores/**',
+                                'infrastructures',
+                                'infrastructures/**'
                             ],
                             message: 'shared must not depend on app layers.'
                         }
