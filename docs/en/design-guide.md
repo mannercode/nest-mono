@@ -14,12 +14,12 @@ Client ── HTTP ──▶ Gateway ──┬──▶ Applications     (Busine
                              └──▶ Infrastructures   (External service integrations)
 ```
 
-| Layer               | Role                                       | Domains                                                                                       |
-| ------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| **Gateway**         | API entry point, auth (JWT/Local)          | Customers, Movies, Theaters, Booking, Purchase, ShowtimeCreation                              |
-| **Applications**    | Business orchestration, BullMQ async tasks | ShowtimeCreation, Booking, Purchase, Recommendation                                           |
-| **Cores**           | Core domain entities, data persistence     | Customers, Movies, Theaters, Showtimes, Tickets, TicketHolding, PurchaseRecords, WatchRecords |
-| **Infrastructures** | External service integration               | Payments, Assets(MinIO)                                                                       |
+| Layer               | Role                                   | Domains                                                                                       |
+| ------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **Gateway**         | API entry point, auth (JWT/Local)      | Customers, Movies, Theaters, Booking, Purchase, ShowtimeCreation                              |
+| **Applications**    | Business orchestration                 | ShowtimeCreation, Booking, Purchase, Recommendation                                           |
+| **Cores**           | Core domain entities, data persistence | Customers, Movies, Theaters, Showtimes, Tickets, TicketHolding, PurchaseRecords, WatchRecords |
+| **Infrastructures** | External service integration           | Payments, Assets(MinIO)                                                                       |
 
 | Component   | Configuration                                     |
 | ----------- | ------------------------------------------------- |
@@ -34,6 +34,10 @@ Without restrictions on inter-module references, a relationship that starts as A
 ### 1.2. Solution: Layer Separation
 
 This project separates modules into three layers and fundamentally prevents circular references. This structure is called SoLA (Service-oriented Layered Architecture).
+
+SoLA was originally designed for microservices architecture (MSA). In MSA, services are physically separated, making direct same-layer references impossible, and service composition is handled by orchestrators or API Gateways. SoLA applies this isolation principle at the module level within a monolith as well.
+
+The reason for applying SoLA in a monolith is that the service can transition to MSA as it grows. By maintaining module isolation from the monolith stage, the cost of breaking code-level dependencies when later extracting a specific module into an independent service is minimized. However, MSA transition involves additional costs beyond code separation, such as network calls, distributed transactions, and data consistency.
 
 A typical layered architecture only forbids upward references (lower → upper) and allows same-layer references. However, SoLA also **forbids references between modules in the same layer**. Allowing same-layer module references can eventually lead to circular dependencies. When multiple modules need to be composed, they must be assembled in an upper layer.
 
@@ -68,71 +72,88 @@ Just as objects are classified into Application, Domain, and Infrastructure laye
 
 ### 1.4. Application Service Design
 
-Use cases, REST API namespaces, and Application Services correspond 1:1.
+Application Services are created **only when multiple Core Services need to be composed**. APIs that can be handled by a single Core Service call the Core Service directly from the controller.
 
-```plantuml
-@startuml
-left to right direction
-actor administrator
-actor customer
-
-rectangle "Use Cases" {
-    usecase "Create Showtimes" as UC1
-    usecase "Book Tickets" as UC2
-    usecase "Purchase Tickets" as UC3
-}
-
-rectangle "REST API" {
-    component "/showtime-creation/*" as API1
-    component "/booking/*" as API2
-    component "/purchases/*" as API3
-}
-
-rectangle "Application Services" {
-    component "ShowtimeCreationService" as SVC1
-    component "BookingService" as SVC2
-    component "PurchaseService" as SVC3
-}
-
-administrator --> UC1
-customer --> UC2
-customer --> UC3
-
-UC1 ..> API1
-UC2 ..> API2
-UC3 ..> API3
-
-API1 ..> SVC1
-API2 ..> SVC2
-API3 ..> SVC3
-@enduml
 ```
+# When Application Service is needed — use cases composing multiple Cores
+ShowtimeCreationService   → ShowtimesService + MoviesService + TheatersService + TicketsService
+BookingService            → ShowtimesService + TicketsService + TicketHoldingService
+PurchaseService           → TicketsService + PurchaseRecordsService + PaymentsService
 
-Starting from use cases, APIs are designed, and services are built to match the API structure, so the three layers naturally align. When this correspondence is maintained, use case → API → service can be consistently traced from anywhere in the code.
+# When Application Service is unnecessary — a single Core suffices
+GET /movies/:id           → MoviesService.getMany()
+POST /theaters            → TheatersService.create()
+```
 
 Application Services focus on their role as orchestrators. When business logic becomes complex, responsibilities are distributed to internal classes.
 
+#### 1.4.1. Service Injection in Controllers
+
+A single resource controller can inject both Core Services and Application Services. Simple CRUD calls the Core Service, while APIs that compose multiple domains call the Application Service.
+
+```ts
+@Controller('showtimes')
+export class ShowtimesHttpController {
+    constructor(
+        private readonly showtimesService: ShowtimesService, // Core
+        private readonly showtimeCreationService: ShowtimeCreationService // Application
+    ) {}
+
+    @Get(':showtimeId')
+    async get(@Param('showtimeId') showtimeId: string) {
+        return this.showtimesService.getMany([showtimeId]) // Simple query → Core directly
+    }
+
+    @Post()
+    async create(@Body() body: CreateShowtimesDto) {
+        return this.showtimeCreationService.create(body) // Composition needed → Application
+    }
+}
 ```
-ShowtimeCreationService            (Orchestrator)
-  └─ ShowtimeCreationWorkerService (BullMQ Worker, controls task flow)
-       ├─ ShowtimeBulkValidatorService  (Request validation)
-       └─ ShowtimeBulkCreatorService    (Showtime/Ticket creation)
-```
+
+However, when a complex use case consists of multiple APIs and requires an independent entry point, it can be separated into a dedicated controller and namespace (see 2.1).
 
 ---
 
 ## 2. REST API Design
 
-### 2.1. Namespace
+### 2.1. Resource-Centered Design
 
-API paths use namespaces that reflect the use case context. Grouping APIs by namespace means the API rarely needs to change unless the use case requirements change significantly.
+REST APIs are designed around **resources**. URL paths are structured based on domain resources, and relationships between resources are expressed through nested paths.
+
+```
+GET    /movies                    Resource list
+GET    /movies/:id                Resource detail
+POST   /movies                    Resource creation
+PATCH  /movies/:id                Resource update
+DELETE /movies/:id                Resource deletion
+GET    /movies/:id/showtimes      Sub-resource query
+```
+
+**Complex use cases** can use namespaces. A complex use case is one where a top-level use case is decomposed into multiple sub-use cases, each corresponding to an individual API. In this case, the sub-APIs are not used standalone outside the context of that use case.
+
+```
+# Complex use case — using namespace
+# "Book Tickets" = search theaters → search show dates → search showtimes → view seats → hold seats
+GET  /booking/movies/:id/theaters
+GET  /booking/movies/:id/theaters/:id/showdates
+GET  /booking/movies/:id/theaters/:id/showdates/:date/showtimes
+GET  /booking/showtimes/:id/tickets
+POST /booking/showtimes/:id/tickets/hold
+
+# Single resource — no namespace
+# Showtime query can be used independently outside booking context
+GET  /showtimes/:id
+```
+
+Namespaces are not used for single resource CRUD or APIs that are independently meaningful in other contexts.
 
 ### 2.2. Long Query Parameters
 
 APIs where query parameters can be lengthy are defined as POST.
 
 ```
-POST /showtime-creation/showtimes/search
+POST /showtimes/search
 {
     "theaterIds": [...]
 }
@@ -140,11 +161,11 @@ POST /showtime-creation/showtimes/search
 
 ### 2.3. Async Requests
 
-Long-running tasks return 202 Accepted and are processed asynchronously.
+Long-running tasks return 202 Accepted and are processed asynchronously. Progress can be delivered to the client via SSE.
 
 ```
-POST /showtime-creation/showtimes → 202 Accepted { sagaId }
-SSE  /showtime-creation/event-stream → { status, sagaId }
+POST /some-resource        → 202 Accepted { taskId }
+SSE  /some-resource/events → { status, taskId }
 ```
 
 ---
@@ -165,18 +186,21 @@ The same concept can be either an Entity or a Value Object depending on the doma
 
 ### 3.3. sagaId
 
-A `sagaId` attribute is added to related entities for tracking and canceling async bulk operations.
+When async bulk operations are needed, a `sagaId` attribute can be added to related entities for tracking and cancellation.
 
 ---
 
 ## 4. Service Call Flow
 
-REST API calls inject and execute services directly from HTTP controllers.
+REST API calls execute services through 4 steps.
 
 ```
-┌─────────────────────────────┐      ┌──────────────────────┐
-│  #1 Gateway HTTP Controller ├─────>│    #2 Service        │
-└─────────────────────────────┘      └──────────────────────┘
+┌────────────────────────────┐        ┌──────────────────────────────┐
+│    #1 Gateway Controller   │        │          #4 Service          │
+│      ┌─────────────────────┤        ├────────────────────────┐     │
+│      │  #2 Service Client  ├───────>│  #3 Service Controller │     │
+│      └─────────────────────┤        ├────────────────────────┘     │
+└────────────────────────────┘        └──────────────────────────────┘
 ```
 
 ```
@@ -188,7 +212,9 @@ apps
 └── cores
     └── services
         └── movies
-            └── #2 movies.service.ts
+            ├── #2 movies.client.ts
+            ├── #3 movies.controller.ts
+            └── #4 movies.service.ts
 ```
 
 ---
