@@ -27,7 +27,12 @@ describe('ShowtimeCreationService', () => {
             it('returns the default page of movies', async () => {
                 await fix.httpClient
                     .get('/showtime-creation/movies')
-                    .ok({ items: [movie], page: expect.any(Number), limit: expect.any(Number), total: 1 })
+                    .ok({
+                        items: [movie],
+                        page: expect.any(Number),
+                        limit: expect.any(Number),
+                        total: 1
+                    })
             })
         })
     })
@@ -39,7 +44,12 @@ describe('ShowtimeCreationService', () => {
             it('returns the default page of theaters', async () => {
                 await fix.httpClient
                     .get('/showtime-creation/theaters')
-                    .ok({ items: [theater], page: expect.any(Number), limit: expect.any(Number), total: 1 })
+                    .ok({
+                        items: [theater],
+                        page: expect.any(Number),
+                        limit: expect.any(Number),
+                        total: 1
+                    })
             })
         })
     })
