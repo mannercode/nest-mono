@@ -1,5 +1,4 @@
 process.loadEnvFile('.env')
-process.loadEnvFile('.env.infra')
 
 setEnv('NODE_ENV', 'test')
 

@@ -13,7 +13,7 @@ const nodeBuiltinModulePattern = `^(?:node:)?(?:${[
     .sort()
     .map(escapeForRegex)
     .join('|')})(?:/.*)?$`
-const internalAliasPattern = '^(?:applications|controllers|cores|infrastructures|common|shared|testlib)$'
+const internalAliasPattern = '^(?:applications|controllers|cores|infrastructures|shared)$'
 const dependencyIgnorePatterns = ['^\\.', nodeBuiltinModulePattern, internalAliasPattern]
 const sourceDependencyOptions = {
     packageDir: __dirname,
@@ -103,7 +103,6 @@ module.exports = [
     {
         files: [
             'src/**/__tests__/**/*.ts',
-            'src/libs/testlib/**/*.ts',
             'src/development.ts'
         ],
         languageOptions: { globals: { ...baseGlobals, ...globals.jest } },

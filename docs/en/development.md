@@ -46,11 +46,10 @@ To fork and rename the project, modify two places:
 
 ### Tasks (`.vscode/tasks.json`)
 
-| Task            | Description                                              |
-| --------------- | -------------------------------------------------------- |
-| `Run Tests`     | Runs `npm test`. Use `TEST_ROOT` input to specify scope. |
-| `Run E2E Tests` | Runs `npm run test:e2e`. Requires `curl` and `jq`.       |
-| `Repeat Tests`  | Repeats a selected test command N times.                 |
+| Task            | Description                                        |
+| --------------- | -------------------------------------------------- |
+| `Run Tests`     | Runs `npm test`.                                   |
+| `Run E2E Tests` | Runs `npm run test:e2e`. Requires `curl` and `jq`. |
 
 ---
 
@@ -99,12 +98,6 @@ Each folder has an `index.ts` (barrel export) to re-export public APIs. Follow t
     ```
 
 > Having `index.ts` in each folder helps detect circular references earlier.
-
-### Circular References between testlib and common
-
-`src/libs` contains `testlib` and `common`. `testlib` imports `common`, and `common`'s `__tests__` folder imports `testlib`. While this appears circular, the `__tests__` folder is test-only and not referenced at runtime, so no actual circular reference issue occurs.
-
----
 
 ## Dynamic Import in Tests
 
@@ -233,10 +226,6 @@ Directly inject and use `FoosService` in Gateway HTTP controllers.
 ### Infrastructure Connection Failure After Dev Container Start
 
 If tests are run before `npm run infra:reset` (executed via `postStartCommand`) completes, connection errors may occur. Wait for `npm run infra:reset` to finish in the terminal before running tests.
-
-### Timeout During `npm test`
-
-Testcontainers pulls Docker images on first run. This may take time depending on the network environment. Pre-pulling images defined in `.env.infra` with `docker pull` can speed things up.
 
 ### ESLint Layer Rule Violation Warning
 

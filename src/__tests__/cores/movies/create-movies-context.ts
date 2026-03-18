@@ -1,5 +1,5 @@
+import type { TestContext } from '@mannercode/nestlib-testing'
 import type { MovieDto } from 'cores'
-import type { TestContext } from 'testlib'
 import { RecommendationService } from 'applications'
 import { MoviesHttpController } from 'controllers'
 import { MoviesModule } from 'cores'

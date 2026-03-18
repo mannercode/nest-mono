@@ -1,5 +1,5 @@
+import { DateUtil, OrderDirection } from '@mannercode/nestlib-common'
 import { Injectable } from '@nestjs/common'
-import { DateUtil, OrderDirection } from 'common'
 import { MovieDto, MoviesService, ShowtimesService, WatchRecordsService } from 'cores'
 import { Rules } from 'shared'
 import { MovieRecommender } from './domain'
@@ -26,7 +26,7 @@ export class RecommendationService {
             const { items } = await this.watchRecordsService.searchPage({
                 customerId,
                 orderby: { direction: OrderDirection.Desc, name: 'watchDate' },
-                take: 50
+                limit: 50
             })
             const movieIds = items.map((record) => record.movieId)
             watchedMovies = await this.moviesService.getMany(movieIds)

@@ -1,5 +1,5 @@
+import type { TestContext } from '@mannercode/nestlib-testing'
 import type { AssetsService } from 'infrastructures'
-import type { TestContext } from 'testlib'
 import type { TestAsset } from '../../__helpers__'
 import type { MoviesBaseContext } from './create-movies-context'
 import { buildCreateAssetDto, testAssets, uploadAsset } from '../../__helpers__'

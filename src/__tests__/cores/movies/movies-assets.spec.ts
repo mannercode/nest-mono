@@ -1,7 +1,7 @@
 import type { MovieDto } from 'cores'
 import type { AssetPresignedUploadDto } from 'infrastructures'
-import { Require } from 'common'
-import { nullObjectId } from 'testlib'
+import { Require } from '@mannercode/nestlib-common'
+import { nullObjectId } from '@mannercode/nestlib-testing'
 import type { MoviesAssetsFixture } from './movies-assets.fixture'
 import { buildCreateAssetDto, Errors, testAssets, uploadAsset } from '../../__helpers__'
 import {

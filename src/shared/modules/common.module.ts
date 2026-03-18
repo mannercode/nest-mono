@@ -1,13 +1,13 @@
-import { Global, Module } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core'
-import { ScheduleModule } from '@nestjs/schedule'
 import {
     AppLoggerService,
     createWinstonLogger,
     ExceptionLoggerFilter,
     SuccessLoggerInterceptor
-} from 'common'
+} from '@mannercode/nestlib-common'
+import { Global, Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core'
+import { ScheduleModule } from '@nestjs/schedule'
 import { AppConfigService } from '../config'
 import { RequestValidationPipe } from '../pipes/request-validation.pipe'
 

@@ -27,10 +27,8 @@ export default {
         '/development\\.ts$',
         '/main\\.ts$',
         '/shared/configure-app\\.ts$',
-        '/modules/',
         '/index\\.ts$',
         '\\.module\\.ts$',
-        '/libs/testlib/'
     ],
     coverageDirectory: '<rootDir>/_output/coverage',
     testTimeout: 60 * 1000

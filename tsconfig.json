@@ -24,8 +24,6 @@
         "baseUrl": ".",
         "outDir": "./_output/build",
         "paths": {
-            "common": ["src/libs/common/index"],
-            "testlib": ["src/libs/testlib/index"],
             "shared": ["src/shared/index"],
             "applications": ["src/applications/index"],
             "cores": ["src/cores/index"],

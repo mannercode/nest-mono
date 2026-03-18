@@ -36,7 +36,6 @@
                 "esbenp.prettier-vscode",
                 "mutantdino.resourcemonitor",
                 "mkhl.shfmt",
-                "github.vscode-pull-request-github",
                 "anthropic.claude-code"
             ],
             "settings": {

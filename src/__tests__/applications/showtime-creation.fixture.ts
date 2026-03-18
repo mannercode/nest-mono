@@ -1,5 +1,5 @@
+import { Json } from '@mannercode/nestlib-common'
 import { ShowtimeCreationModule } from 'applications'
-import { Json } from 'common'
 import { ShowtimeCreationHttpController } from 'controllers'
 import {
     MoviesModule,

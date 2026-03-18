@@ -1,5 +1,5 @@
+import type { TestContext } from '@mannercode/nestlib-testing'
 import type { TheaterLocation } from 'cores'
-import type { TestContext } from 'testlib'
 import { BookingModule, PurchaseModule } from 'applications'
 import { BookingHttpController, CustomerJwtStrategy } from 'controllers'
 import {

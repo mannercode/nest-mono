@@ -1,9 +1,9 @@
 import type { MovieDto, SearchMoviesPageDto } from 'cores'
-import { Checksum } from 'common'
+import { Checksum } from '@mannercode/nestlib-common'
+import { nullObjectId } from '@mannercode/nestlib-testing'
 import { MovieGenre, MovieRating } from 'cores'
 import { omit } from 'lodash'
 import { Rules } from 'shared'
-import { nullObjectId } from 'testlib'
 import type { MoviesFixture } from './movies.fixture'
 import {
     buildCreateMovieDto,
@@ -258,8 +258,8 @@ describe('MoviesService', () => {
             movies.forEach((movie) => (movie.imageUrls = expect.any(Array)))
             return {
                 items: expect.arrayContaining(movies),
-                skip: 0,
-                take: expect.any(Number),
+                page: expect.any(Number),
+                limit: expect.any(Number),
                 total: movies.length
             }
         }

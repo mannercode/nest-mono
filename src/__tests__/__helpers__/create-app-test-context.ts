@@ -1,11 +1,12 @@
+import type { HttpTestContext, ModuleMetadataEx } from '@mannercode/nestlib-testing'
 import type { QueueOptions } from 'bullmq'
 import type Redis from 'ioredis'
-import type { HttpTestContext, ModuleMetadataEx } from 'testlib'
+import { AppLoggerService } from '@mannercode/nestlib-common'
+import { createHttpTestContext, isDebuggingEnabled } from '@mannercode/nestlib-testing'
 import { BullModule } from '@nestjs/bullmq'
 import { ConfigService } from '@nestjs/config'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { SchedulerRegistry } from '@nestjs/schedule'
-import { AppLoggerService } from 'common'
 import compression from 'compression'
 import express from 'express'
 import {
@@ -15,7 +16,6 @@ import {
     MongooseConfigModule,
     RedisConfigModule
 } from 'shared'
-import { createHttpTestContext, isDebuggingEnabled } from 'testlib'
 
 export type AppTestContext = HttpTestContext & { teardown: () => Promise<void> }
 

@@ -1,6 +1,6 @@
+import { PaginationDto } from '@mannercode/nestlib-common'
+import { OrderDirection } from '@mannercode/nestlib-common'
 import { Injectable } from '@nestjs/common'
-import { PaginationDto } from 'common'
-import { OrderDirection } from 'common'
 import { MoviesService, ShowtimesService, TheatersService } from 'cores'
 import { BulkCreateShowtimesDto, RequestShowtimeCreationResponse } from './dtos'
 import { ShowtimeCreationWorkerService } from './services'

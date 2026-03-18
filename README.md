@@ -25,7 +25,7 @@ A monolithic architecture template based on NestJS. Uses a movie ticketing domai
 | **Events**         | EventEmitter2              |
 | **Object Storage** | MinIO (S3-compatible)      |
 | **Auth**           | JWT + Passport             |
-| **Testing**        | Jest + Testcontainers      |
+| **Testing**        | Jest                       |
 | **Build**          | Webpack                    |
 | **Container**      | Docker (multi-stage build) |
 
@@ -79,13 +79,10 @@ npm test
 
 ### Unit Tests
 
-Uses [Testcontainers](https://testcontainers.com/) to spin up real MongoDB, Redis, and MinIO containers for testing.
+Requires infrastructure to be running (`npm run infra:reset`).
 
 ```bash
 npm test
-
-# Test a specific service only
-TEST_ROOT=src/apps/__tests__/cores npm test
 ```
 
 ### E2E Tests
@@ -100,19 +97,18 @@ npm run test:e2e
 
 ```
 src/
-├── apps/
-│   ├── gateway/          # HTTP API controllers, authentication
-│   ├── applications/     # Business logic services (BullMQ)
-│   ├── cores/            # Domain models, repositories
-│   ├── infrastructures/  # External service integrations (payments, files)
-│   ├── shared/           # Common config, business rules (Rules), pipes, middleware
-│   └── __tests__/        # Unit/integration tests
-├── libs/
-│   ├── common/           # Common libraries (logging, DB, cache)
-│   └── testlib/          # Test utilities
+├── controllers/          # HTTP API controllers, authentication
+├── applications/         # Business logic services (BullMQ)
+├── cores/                # Domain models, repositories
+├── infrastructures/      # External service integrations (payments, files)
+├── shared/               # Common config, business rules (Rules), pipes, middleware
+├── modules/              # NestJS module definitions
+├── __tests__/            # Unit/integration tests
 ├── tests/e2e/            # E2E test specs
 └── infra/local/          # Local infrastructure Docker Compose
 ```
+
+Common libraries (logging, DB, cache) and test utilities are provided by the [@mannercode/nestlib](https://github.com/mannercode/nestlib) npm packages (`@mannercode/nestlib-common`, `@mannercode/nestlib-testing`).
 
 ## Key Concepts
 
@@ -146,4 +142,4 @@ Provides HTTP health check endpoints integrated with Docker health checks. Conta
 
 ### Testing Strategy
 
-Tests use Testcontainers to spin up real MongoDB, Redis, and MinIO containers. Using real infrastructure instead of mocks allows verifying behaviors like transactions, indexes, and TTL as-is. E2E tests run the full stack via Docker Compose and validate scenarios at the HTTP API level.
+Tests use real MongoDB, Redis, and MinIO infrastructure instead of mocks, allowing verification of behaviors like transactions, indexes, and TTL as-is. E2E tests run the full stack via Docker Compose and validate scenarios at the HTTP API level.

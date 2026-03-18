@@ -1,3 +1,4 @@
+import { Require } from '@mannercode/nestlib-common'
 import {
     Body,
     Controller,
@@ -12,7 +13,6 @@ import {
     Req,
     UseGuards
 } from '@nestjs/common'
-import { Require } from 'common'
 import {
     CreateCustomerDto,
     CustomersService,
