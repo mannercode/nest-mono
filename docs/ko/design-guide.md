@@ -192,29 +192,23 @@ SSE  /some-resource/events → { status, taskId }
 
 ## 4. 서비스 호출 흐름
 
-REST API 호출은 4단계를 거쳐 서비스를 실행한다.
+REST API 호출은 HTTP 컨트롤러가 서비스를 직접 주입받아 실행한다.
 
 ```
-┌────────────────────────────┐        ┌──────────────────────────────┐
-│    #1 Gateway Controller   │        │          #4 Service          │
-│      ┌─────────────────────┤        ├────────────────────────┐     │
-│      │  #2 Service Client  ├───────>│  #3 Service Controller │     │
-│      └─────────────────────┤        ├────────────────────────┘     │
-└────────────────────────────┘        └──────────────────────────────┘
+┌──────────────────────────┐        ┌──────────────────────────┐
+│    HTTP Controller       ├───────>│         Service          │
+└──────────────────────────┘        └──────────────────────────┘
 ```
 
 ```
-apps
-├── gateway
-│   └── controllers
-│       └── #1 movies.http-controller.ts
+src/
+├── controllers/
+│   └── movies.http-controller.ts
 │
-└── cores
-    └── services
-        └── movies
-            ├── #2 movies.client.ts
-            ├── #3 movies.controller.ts
-            └── #4 movies.service.ts
+└── cores/
+    └── services/
+        └── movies/
+            └── movies.service.ts
 ```
 
 ---

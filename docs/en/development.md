@@ -46,10 +46,10 @@ To fork and rename the project, modify two places:
 
 ### Tasks (`.vscode/tasks.json`)
 
-| Task            | Description                                        |
-| --------------- | -------------------------------------------------- |
-| `Run Tests`     | Runs `npm test`.                                   |
-| `Run E2E Tests` | Runs `npm run test:e2e`. Requires `curl` and `jq`. |
+| Task             | Description                                        |
+| ---------------- | -------------------------------------------------- |
+| `Run Unit Tests` | Runs `npm run test:unit`.                          |
+| `Run E2E Tests`  | Runs `npm run test:e2e`. Requires `curl` and `jq`. |
 
 ---
 
@@ -57,13 +57,13 @@ To fork and rename the project, modify two places:
 
 The `no-restricted-imports` rules in `eslint.config.js` detect [SoLA layer](design-guide.md#1-service-architecture--sola-service-oriented-layered-architecture) violations at build time.
 
-| Layer (`src/apps/`) | Restricted References                                 |
-| ------------------- | ----------------------------------------------------- |
-| `gateway`           | None (can reference all lower layers)                 |
-| `applications`      | `gateway`                                             |
-| `cores`             | `gateway`, `applications`                             |
-| `infrastructures`   | `gateway`, `applications`, `cores`                    |
-| `shared`            | `gateway`, `applications`, `cores`, `infrastructures` |
+| Layer (`src/`)    | Restricted References                                     |
+| ----------------- | --------------------------------------------------------- |
+| `controllers`     | None (can reference all lower layers)                     |
+| `applications`    | `controllers`                                             |
+| `cores`           | `controllers`, `applications`                             |
+| `infrastructures` | `controllers`, `applications`, `cores`                    |
+| `shared`          | `controllers`, `applications`, `cores`, `infrastructures` |
 
 Violations are reported as ESLint `warn`. Run `npm run lint` for a full check.
 
@@ -101,7 +101,7 @@ Each folder has an `index.ts` (barrel export) to re-export public APIs. Follow t
 
 ## Dynamic Import in Tests
 
-Each test generates a unique DB name using `process.env.TESTLIB_ID`.
+Each test generates a unique DB name using `process.env.TEST_ID`.
 
 Jest is configured with `resetModules: true`, and tests use dynamic imports so each test runs in an isolated environment.
 
@@ -123,7 +123,7 @@ describe('Customers', () => {
 
 ## Entry File Structure
 
-The `src/apps/gateway/` directory contains the following files:
+The `src/` directory contains the following entry files:
 
 - `development.ts` — Development environment entry
 - `main.ts` — Common bootstrap logic
@@ -133,7 +133,7 @@ Instead of using `process.env.NODE_ENV` branching in `main.ts`, separate entry f
 
 ```json
 // nest-cli.json — development
-"entryFile": "apps/gateway/development"
+"entryFile": "development"
 ```
 
 ```js
@@ -188,7 +188,7 @@ Uses `FooService` as an example for adding a Core service. The same pattern appl
 ### 1. Create Directory and Files
 
 ```
-src/apps/cores/services/foos/
+src/cores/services/foos/
 ├── foo.ts                        # Domain model
 ├── foos.module.ts
 ├── foos.service.ts
@@ -202,7 +202,7 @@ src/apps/cores/services/foos/
 
 ### 2. Register the Module
 
-Add `FoosModule` to the `imports` array in `src/apps/cores/cores.module.ts`. `FoosModule` must `exports` `FoosService` for other layers to use it.
+Add `FoosModule` to the `imports` array in `src/cores/cores.module.ts`. `FoosModule` must `exports` `FoosService` for other layers to use it.
 
 ```typescript
 @Module({

@@ -192,29 +192,23 @@ When async bulk operations are needed, a `sagaId` attribute can be added to rela
 
 ## 4. Service Call Flow
 
-REST API calls execute services through 4 steps.
+REST API calls flow through HTTP controllers that directly inject services.
 
 ```
-┌────────────────────────────┐        ┌──────────────────────────────┐
-│    #1 Gateway Controller   │        │          #4 Service          │
-│      ┌─────────────────────┤        ├────────────────────────┐     │
-│      │  #2 Service Client  ├───────>│  #3 Service Controller │     │
-│      └─────────────────────┤        ├────────────────────────┘     │
-└────────────────────────────┘        └──────────────────────────────┘
+┌──────────────────────────┐        ┌──────────────────────────┐
+│    HTTP Controller       ├───────>│         Service          │
+└──────────────────────────┘        └──────────────────────────┘
 ```
 
 ```
-apps
-├── gateway
-│   └── controllers
-│       └── #1 movies.http-controller.ts
+src/
+├── controllers/
+│   └── movies.http-controller.ts
 │
-└── cores
-    └── services
-        └── movies
-            ├── #2 movies.client.ts
-            ├── #3 movies.controller.ts
-            └── #4 movies.service.ts
+└── cores/
+    └── services/
+        └── movies/
+            └── movies.service.ts
 ```
 
 ---
