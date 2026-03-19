@@ -178,7 +178,7 @@ describe('CustomersService', () => {
         const buildExpectedPage = (customers: CustomerDto[]) => ({
             items: expect.arrayContaining(customers),
             page: expect.any(Number),
-            limit: expect.any(Number),
+            size: expect.any(Number),
             total: customers.length
         })
 

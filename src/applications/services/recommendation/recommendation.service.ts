@@ -26,7 +26,7 @@ export class RecommendationService {
             const { items } = await this.watchRecordsService.searchPage({
                 customerId,
                 orderby: { direction: OrderDirection.Desc, name: 'watchDate' },
-                limit: 50
+                size: 50
             })
             const movieIds = items.map((record) => record.movieId)
             watchedMovies = await this.moviesService.getMany(movieIds)

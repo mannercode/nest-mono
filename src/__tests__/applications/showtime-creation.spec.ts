@@ -30,7 +30,7 @@ describe('ShowtimeCreationService', () => {
                     .ok({
                         items: [movie],
                         page: expect.any(Number),
-                        limit: expect.any(Number),
+                        size: expect.any(Number),
                         total: 1
                     })
             })
@@ -47,7 +47,7 @@ describe('ShowtimeCreationService', () => {
                     .ok({
                         items: [theater],
                         page: expect.any(Number),
-                        limit: expect.any(Number),
+                        size: expect.any(Number),
                         total: 1
                     })
             })

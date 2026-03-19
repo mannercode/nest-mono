@@ -159,7 +159,7 @@ describe('TheatersService', () => {
         const buildExpectedPage = (theaters: TheaterDto[]) => ({
             items: expect.arrayContaining(theaters),
             page: expect.any(Number),
-            limit: expect.any(Number),
+            size: expect.any(Number),
             total: theaters.length
         })
 

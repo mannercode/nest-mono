@@ -259,7 +259,7 @@ describe('MoviesService', () => {
             return {
                 items: expect.arrayContaining(movies),
                 page: expect.any(Number),
-                limit: expect.any(Number),
+                size: expect.any(Number),
                 total: movies.length
             }
         }
