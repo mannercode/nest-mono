@@ -108,7 +108,7 @@ src/
 └── infra/local/          # 로컬 인프라 Docker Compose
 ```
 
-공통 라이브러리(로깅, DB, 캐시)와 테스트 유틸리티는 [@mannercode/nestlib](https://github.com/mannercode/nestlib) npm 패키지(`@mannercode/nestlib-common`, `@mannercode/nestlib-testing`)로 제공된다.
+공통 라이브러리(로깅, DB, 캐시)와 테스트 유틸리티는 [@mannercode/nest](https://github.com/mannercode/nest) npm 패키지(`@mannercode/nest-common`, `@mannercode/nest-testing`)로 제공된다.
 
 ## Key Concepts
 

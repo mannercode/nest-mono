@@ -1,8 +1,8 @@
-import type { TestContext } from '@mannercode/nestlib-testing'
+import type { TestContext } from '@mannercode/nest-testing'
 import type { CreatePurchaseDto } from 'applications'
 import type { TicketDto } from 'cores'
-import { DateUtil, pickIds } from '@mannercode/nestlib-common'
-import { oid, toAny } from '@mannercode/nestlib-testing'
+import { DateUtil, pickIds } from '@mannercode/nest-common'
+import { oid, toAny } from '@mannercode/nest-testing'
 import { PurchaseModule } from 'applications'
 import { PurchaseHttpController } from 'controllers'
 import {

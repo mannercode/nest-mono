@@ -1,6 +1,6 @@
 import type { TicketDto } from 'cores'
-import { pickIds } from '@mannercode/nestlib-common'
-import { oid } from '@mannercode/nestlib-testing'
+import { pickIds } from '@mannercode/nest-common'
+import { oid } from '@mannercode/nest-testing'
 import { HttpStatus } from '@nestjs/common'
 import { TicketStatus } from 'cores'
 import type { TicketsFixture } from './tickets.fixture'

@@ -1,6 +1,6 @@
 import type { MovieDto, ShowtimeDto, TheaterDto, TicketDto } from 'cores'
-import { DateUtil, pickIds } from '@mannercode/nestlib-common'
-import { nullObjectId, oid, step } from '@mannercode/nestlib-testing'
+import { DateUtil, pickIds } from '@mannercode/nest-common'
+import { nullObjectId, oid, step } from '@mannercode/nest-testing'
 import { TicketStatus } from 'cores'
 import type { BookingFixture } from './booking.fixture'
 import { Errors } from '../__helpers__'

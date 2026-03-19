@@ -1,6 +1,6 @@
 import type { MovieDto, SearchMoviesPageDto } from 'cores'
-import { Checksum } from '@mannercode/nestlib-common'
-import { nullObjectId } from '@mannercode/nestlib-testing'
+import { Checksum } from '@mannercode/nest-common'
+import { nullObjectId } from '@mannercode/nest-testing'
 import { MovieGenre, MovieRating } from 'cores'
 import { omit } from 'lodash'
 import { Rules } from 'shared'

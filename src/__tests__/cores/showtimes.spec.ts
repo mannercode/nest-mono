@@ -1,6 +1,6 @@
 import type { ShowtimeDto } from 'cores'
-import { DateUtil, pickIds } from '@mannercode/nestlib-common'
-import { nullObjectId, oid } from '@mannercode/nestlib-testing'
+import { DateUtil, pickIds } from '@mannercode/nest-common'
+import { nullObjectId, oid } from '@mannercode/nest-testing'
 import { HttpStatus } from '@nestjs/common'
 import type { ShowtimesFixture } from './showtimes.fixture'
 import { buildCreateShowtimeDto, createShowtimes, Errors } from '../__helpers__'

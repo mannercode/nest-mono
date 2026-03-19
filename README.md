@@ -108,7 +108,7 @@ src/
 └── infra/local/          # Local infrastructure Docker Compose
 ```
 
-Common libraries (logging, DB, cache) and test utilities are provided by the [@mannercode/nestlib](https://github.com/mannercode/nestlib) npm packages (`@mannercode/nestlib-common`, `@mannercode/nestlib-testing`).
+Common libraries (logging, DB, cache) and test utilities are provided by the [@mannercode/nest](https://github.com/mannercode/nest) npm packages (`@mannercode/nest-common`, `@mannercode/nest-testing`).
 
 ## Key Concepts
 

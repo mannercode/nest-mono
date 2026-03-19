@@ -1,4 +1,4 @@
-import { Json, newObjectIdString } from '@mannercode/nestlib-common'
+import { Json, newObjectIdString } from '@mannercode/nest-common'
 import { InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq'
 import { OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { Injectable } from '@nestjs/common'

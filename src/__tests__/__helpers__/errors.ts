@@ -1,4 +1,4 @@
-import { CommonErrors } from '@mannercode/nestlib-common'
+import { CommonErrors } from '@mannercode/nest-common'
 import { ApplicationErrors } from 'applications'
 import { CoreErrors } from 'cores'
 import { SharedErrors } from 'shared'

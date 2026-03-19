@@ -1,4 +1,4 @@
-import { Json } from '@mannercode/nestlib-common'
+import { Json } from '@mannercode/nest-common'
 import { ShowtimeCreationModule } from 'applications'
 import { ShowtimeCreationHttpController } from 'controllers'
 import {

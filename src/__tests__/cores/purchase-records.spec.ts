@@ -1,5 +1,5 @@
 import type { PurchaseRecordDto } from 'cores'
-import { nullObjectId } from '@mannercode/nestlib-testing'
+import { nullObjectId } from '@mannercode/nest-testing'
 import type { PurchaseRecordsFixture } from './purchase-records.fixture'
 import { buildCreatePurchaseRecordDto, createPurchaseRecord, Errors } from '../__helpers__'
 

@@ -1,6 +1,6 @@
 import type { HoldTicketsDto } from 'cores'
-import { sleep } from '@mannercode/nestlib-common'
-import { oid, toAny } from '@mannercode/nestlib-testing'
+import { sleep } from '@mannercode/nest-common'
+import { oid, toAny } from '@mannercode/nest-testing'
 import type { TicketHoldingFixture } from './ticket-holding.fixture'
 import { buildHoldTicketsDto } from '../__helpers__'
 

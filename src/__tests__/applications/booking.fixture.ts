@@ -1,4 +1,4 @@
-import type { TestContext } from '@mannercode/nestlib-testing'
+import type { TestContext } from '@mannercode/nest-testing'
 import type { TheaterLocation } from 'cores'
 import { BookingModule, PurchaseModule } from 'applications'
 import { BookingHttpController, CustomerJwtStrategy } from 'controllers'

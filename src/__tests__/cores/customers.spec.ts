@@ -1,5 +1,5 @@
 import type { CustomerDto, SearchCustomersPageDto } from 'cores'
-import { nullObjectId } from '@mannercode/nestlib-testing'
+import { nullObjectId } from '@mannercode/nest-testing'
 import { omit } from 'lodash'
 import type { CustomersFixture } from './customers.fixture'
 import { buildCreateCustomerDto, createCustomer, Errors } from '../__helpers__'

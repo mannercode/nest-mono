@@ -1,4 +1,4 @@
-import { DateUtil, Require } from '@mannercode/nestlib-common'
+import { DateUtil, Require } from '@mannercode/nest-common'
 import { Injectable } from '@nestjs/common'
 import { ShowtimeDto, ShowtimesService, TheaterDto, TheatersService, TicketsService } from 'cores'
 import { Seatmap, TicketStatus } from 'cores'

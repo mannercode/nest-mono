@@ -1,4 +1,4 @@
-import { DateUtil, OrderDirection } from '@mannercode/nestlib-common'
+import { DateUtil, OrderDirection } from '@mannercode/nest-common'
 import { Injectable } from '@nestjs/common'
 import { MovieDto, MoviesService, ShowtimesService, WatchRecordsService } from 'cores'
 import { Rules } from 'shared'

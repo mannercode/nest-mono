@@ -1,6 +1,6 @@
-import type { TestContext } from '@mannercode/nestlib-testing'
+import type { TestContext } from '@mannercode/nest-testing'
 import type { MovieDto } from 'cores'
-import { DateUtil } from '@mannercode/nestlib-common'
+import { DateUtil } from '@mannercode/nest-common'
 import { RecommendationModule } from 'applications'
 import { CustomerJwtStrategy, MoviesHttpController } from 'controllers'
 import { CustomersModule, MoviesModule, ShowtimesModule, WatchRecordsModule } from 'cores'

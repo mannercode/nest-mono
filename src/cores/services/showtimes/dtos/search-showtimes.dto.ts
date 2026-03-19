@@ -1,4 +1,4 @@
-import { PartialDateTimeRange } from '@mannercode/nestlib-common'
+import { PartialDateTimeRange } from '@mannercode/nest-common'
 import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator'
 
 export class SearchShowtimesDto {

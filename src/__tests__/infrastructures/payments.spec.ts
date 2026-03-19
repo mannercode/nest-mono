@@ -1,6 +1,6 @@
 import type { PaymentDto } from 'infrastructures'
-import { pickIds } from '@mannercode/nestlib-common'
-import { nullObjectId } from '@mannercode/nestlib-testing'
+import { pickIds } from '@mannercode/nest-common'
+import { nullObjectId } from '@mannercode/nest-testing'
 import { HttpStatus } from '@nestjs/common'
 import type { PaymentsFixture } from './payments.fixture'
 import { buildCreatePaymentDto, createPayment, Errors } from '../__helpers__'

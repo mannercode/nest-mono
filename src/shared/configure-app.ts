@@ -1,5 +1,5 @@
 import type { INestApplication } from '@nestjs/common'
-import { AppLoggerService, Path } from '@mannercode/nestlib-common'
+import { AppLoggerService, Path } from '@mannercode/nest-common'
 import compression from 'compression'
 import express from 'express'
 import { exit } from 'process'

@@ -1,5 +1,5 @@
 import type { SearchWatchRecordsPageDto, WatchRecordDto } from 'cores'
-import { oid } from '@mannercode/nestlib-testing'
+import { oid } from '@mannercode/nest-testing'
 import type { WatchRecordsFixture } from './watch-records.fixture'
 import { buildCreateWatchRecordDto, createWatchRecord } from '../__helpers__'
 
