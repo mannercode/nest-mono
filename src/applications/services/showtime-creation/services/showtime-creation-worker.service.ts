@@ -1,7 +1,6 @@
 import { Json, newObjectIdString } from '@mannercode/nest-common'
 import { InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq'
-import { OnModuleDestroy, OnModuleInit } from '@nestjs/common'
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { Job, Queue } from 'bullmq'
 import { ShowtimesService, TicketsService } from 'cores'
 import { get } from 'lodash'
@@ -18,6 +17,8 @@ export class ShowtimeCreationWorkerService
     extends WorkerHost
     implements OnModuleDestroy, OnModuleInit
 {
+    private readonly logger = new Logger(ShowtimeCreationWorkerService.name)
+
     constructor(
         private readonly validatorService: ShowtimeBulkValidatorService,
         private readonly creatorService: ShowtimeBulkCreatorService,
@@ -31,6 +32,8 @@ export class ShowtimeCreationWorkerService
 
     async enqueueShowtimeCreationJob(createDto: BulkCreateShowtimesDto) {
         const sagaId = newObjectIdString()
+
+        this.logger.log('enqueueShowtimeCreationJob', { sagaId })
 
         const jobData = { createDto, sagaId } as ShowtimeCreationJobData
 
@@ -62,11 +65,18 @@ export class ShowtimeCreationWorkerService
 
     async process(job: Job<ShowtimeCreationJobData>) {
         try {
+            this.logger.log('process start', { sagaId: job.data.sagaId })
+
             const jobData = Json.reviveIsoDates(job.data)
 
             await this.processJobData(jobData)
         } catch (error: unknown) {
             const message = get(error, 'message', String(error))
+
+            this.logger.warn('process error, executing compensation', {
+                sagaId: job.data.sagaId,
+                error: message
+            })
 
             try {
                 await this.compensate(job.data.sagaId)
@@ -81,10 +91,11 @@ export class ShowtimeCreationWorkerService
     }
 
     private async compensate(sagaId: string) {
-        await Promise.allSettled([
+        const results = await Promise.allSettled([
             this.ticketsService.deleteBySagaIds([sagaId]),
             this.showtimesService.deleteBySagaIds([sagaId])
         ])
+        this.logger.log('compensate completed', { sagaId, results: results.map((r) => r.status) })
     }
 
     private async processJobData({ createDto, sagaId }: ShowtimeCreationJobData) {

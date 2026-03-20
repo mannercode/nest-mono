@@ -24,7 +24,7 @@
         "baseUrl": ".",
         "outDir": "./_output/build",
         "paths": {
-            "shared": ["src/shared/index"],
+            "app-common": ["src/app-common/index"],
             "applications": ["src/applications/index"],
             "cores": ["src/cores/index"],
             "infrastructures": ["src/infrastructures/index"],

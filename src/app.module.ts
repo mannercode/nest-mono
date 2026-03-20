@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common'
 import { EventEmitterModule } from '@nestjs/event-emitter'
+import { CommonModule, MongooseConfigModule, RedisConfigModule } from 'app-common'
 import { ApplicationsModule } from 'applications'
 import { CoresModule } from 'cores'
 import { InfrastructuresModule } from 'infrastructures'
-import { CommonModule, MongooseConfigModule, RedisConfigModule } from 'shared'
 import {
     BookingHttpController,
     CustomerJwtStrategy,

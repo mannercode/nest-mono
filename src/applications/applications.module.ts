@@ -1,8 +1,8 @@
 import { BullModule } from '@nestjs/bullmq'
 import { Module } from '@nestjs/common'
+import { CommonModule, getProjectId, RedisConfigModule } from 'app-common'
 import { QueueOptions } from 'bullmq'
 import Redis from 'ioredis'
-import { CommonModule, getProjectId, RedisConfigModule } from 'shared'
 import {
     BookingModule,
     PurchaseModule,

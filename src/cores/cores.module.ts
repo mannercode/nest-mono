@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { CommonModule } from 'shared'
+import { CommonModule } from 'app-common'
 import {
     CustomersModule,
     MoviesModule,
