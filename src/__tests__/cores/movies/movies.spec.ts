@@ -2,8 +2,8 @@ import type { MovieDto, SearchMoviesPageDto } from 'cores'
 import { Checksum } from '@mannercode/nest-common'
 import { nullObjectId } from '@mannercode/nest-testing'
 import { MovieGenre, MovieRating } from 'cores'
+import { CoreRules } from 'cores'
 import { omit } from 'lodash'
-import { Rules } from 'shared'
 import type { MoviesFixture } from './movies.fixture'
 import {
     buildCreateMovieDto,
@@ -48,7 +48,7 @@ describe('MoviesService', () => {
                         genres: [],
                         id: expect.any(String),
                         imageUrls: [],
-                        ...Rules.Movie.defaults
+                        ...CoreRules.Movie.defaults
                     })
             })
         })

@@ -13,7 +13,7 @@ const nodeBuiltinModulePattern = `^(?:node:)?(?:${[
     .sort()
     .map(escapeForRegex)
     .join('|')})(?:/.*)?$`
-const internalAliasPattern = '^(?:applications|controllers|cores|infrastructures|shared)$'
+const internalAliasPattern = '^(?:applications|controllers|cores|infrastructures|app-common)$'
 const dependencyIgnorePatterns = ['^\\.', nodeBuiltinModulePattern, internalAliasPattern]
 const sourceDependencyOptions = {
     packageDir: __dirname,
@@ -101,10 +101,7 @@ module.exports = [
         }
     },
     {
-        files: [
-            'src/**/__tests__/**/*.ts',
-            'src/development.ts'
-        ],
+        files: ['src/**/__tests__/**/*.ts', 'src/development.ts'],
         languageOptions: { globals: { ...baseGlobals, ...globals.jest } },
         plugins: { jest: jestPlugin },
         rules: {
@@ -220,16 +217,16 @@ module.exports = [
         }
     },
     {
-        files: ['src/shared/**/*.ts'],
+        files: ['src/app-common/**/*.ts'],
         rules: {
             'no-restricted-imports': [
                 'warn',
                 {
                     patterns: [
                         {
-                            group: ['shared', 'shared/**'],
+                            group: ['app-common', 'app-common/**'],
                             message:
-                                'Use relative imports within shared to avoid ancestor barrel cycles.'
+                                'Use relative imports within app-common to avoid ancestor barrel cycles.'
                         },
                         {
                             group: [
@@ -242,7 +239,7 @@ module.exports = [
                                 'infrastructures',
                                 'infrastructures/**'
                             ],
-                            message: 'shared must not depend on app layers.'
+                            message: 'app-common must not depend on app layers.'
                         }
                     ]
                 }

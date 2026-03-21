@@ -1,5 +1,5 @@
 import { DateUtil, Require } from '@mannercode/nest-common'
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { ShowtimeDto, ShowtimesService, TheaterDto, TheatersService, TicketsService } from 'cores'
 import { Seatmap, TicketStatus } from 'cores'
 import { uniq } from 'lodash'
@@ -7,6 +7,8 @@ import { BulkCreateShowtimesDto } from '../dtos'
 
 @Injectable()
 export class ShowtimeBulkCreatorService {
+    private readonly logger = new Logger(ShowtimeBulkCreatorService.name)
+
     constructor(
         private readonly theatersService: TheatersService,
         private readonly showtimesService: ShowtimesService,
@@ -17,6 +19,12 @@ export class ShowtimeBulkCreatorService {
         const createdShowtimes = await this.bulkCreateShowtimes(createDto, sagaId)
 
         const createdTicketCount = await this.bulkCreateTickets(createdShowtimes, sagaId)
+
+        this.logger.log('create completed', {
+            sagaId,
+            showtimeCount: createdShowtimes.length,
+            ticketCount: createdTicketCount
+        })
 
         return { createdShowtimeCount: createdShowtimes.length, createdTicketCount }
     }

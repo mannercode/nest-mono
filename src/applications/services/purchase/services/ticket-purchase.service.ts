@@ -1,5 +1,5 @@
 import { DateUtil } from '@mannercode/nest-common'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import {
     PurchaseItemDto,
     ShowtimeDto,
@@ -8,14 +8,16 @@ import {
     TicketsService
 } from 'cores'
 import { PurchaseItemType, TicketStatus } from 'cores'
+import { CoreRules } from 'cores'
 import { uniq } from 'lodash'
-import { Rules } from 'shared'
 import { CreatePurchaseDto } from '../dtos'
 import { PurchaseErrors } from '../errors'
 import { PurchaseEvents } from '../purchase.events'
 
 @Injectable()
 export class TicketPurchaseService {
+    private readonly logger = new Logger(TicketPurchaseService.name)
+
     constructor(
         private readonly ticketsService: TicketsService,
         private readonly showtimesService: ShowtimesService,
@@ -29,6 +31,11 @@ export class TicketPurchaseService {
         )
         const ticketIds = ticketItems.map((item) => item.itemId)
 
+        this.logger.log('completePurchase', {
+            customerId: createDto.customerId,
+            ticketCount: ticketIds.length
+        })
+
         await this.ticketsService.updateStatusMany(ticketIds, TicketStatus.Sold)
 
         this.events.emitTicketPurchased(createDto.customerId, ticketIds)
@@ -40,12 +47,18 @@ export class TicketPurchaseService {
         )
         const ticketIds = ticketItems.map((item) => item.itemId)
 
+        this.logger.warn('rollbackPurchase', {
+            customerId: createDto.customerId,
+            ticketCount: ticketIds.length
+        })
+
         await this.ticketsService.updateStatusMany(ticketIds, TicketStatus.Available)
 
         this.events.emitTicketPurchaseCanceled(createDto.customerId, ticketIds)
     }
 
     async validatePurchase(createDto: CreatePurchaseDto): Promise<void> {
+        this.logger.log('validatePurchase', { customerId: createDto.customerId })
         const ticketItems = createDto.purchaseItems.filter(
             (item) => item.type === PurchaseItemType.Tickets
         )
@@ -94,13 +107,13 @@ export class TicketPurchaseService {
         for (const { startTime } of showtimes) {
             const purchaseWindowCloseTime = DateUtil.add({
                 base: startTime,
-                minutes: -Rules.Ticket.purchaseCutoffMinutes
+                minutes: -CoreRules.Ticket.purchaseCutoffMinutes
             })
 
             if (purchaseWindowCloseTime.getTime() < DateUtil.now().getTime()) {
                 throw new BadRequestException(
                     PurchaseErrors.WindowClosed(
-                        Rules.Ticket.purchaseCutoffMinutes,
+                        CoreRules.Ticket.purchaseCutoffMinutes,
                         purchaseWindowCloseTime.toString(),
                         startTime.toString()
                     )
@@ -110,9 +123,9 @@ export class TicketPurchaseService {
     }
 
     private validateTicketCount(ticketItems: PurchaseItemDto[]) {
-        if (Rules.Ticket.maxTicketsPerPurchase < ticketItems.length) {
+        if (CoreRules.Ticket.maxTicketsPerPurchase < ticketItems.length) {
             throw new BadRequestException(
-                PurchaseErrors.LimitExceeded(Rules.Ticket.maxTicketsPerPurchase)
+                PurchaseErrors.LimitExceeded(CoreRules.Ticket.maxTicketsPerPurchase)
             )
         }
     }

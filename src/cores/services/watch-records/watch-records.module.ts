@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
-import { MongooseConfigModule } from 'shared'
+import { MongooseConfigModule } from 'app-common'
 import { WatchRecord, WatchRecordSchema } from './models'
 import { WatchRecordsRepository } from './watch-records.repository'
 import { WatchRecordsService } from './watch-records.service'
